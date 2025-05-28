@@ -425,7 +425,7 @@ function lookupBarcode() {
         ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 0px;">` : ""}`;
       document.getElementById("productInfo").innerHTML = info;
       document.getElementById("productSafetyMsg").textContent = 
-  "No product warnings or safety alerts.";
+  "No product warnings or safety alerts found.";
 
     })
     .catch(error => {
