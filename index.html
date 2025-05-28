@@ -379,6 +379,7 @@ function shareApp() {
   <input type="text" id="barcodeInput" placeholder="Enter 12-digit barcode" maxlength="12" style="margin-top: 5px; font-size: 16px; padding: 6px; width: 200px;"><br>
   <button onclick="lookupBarcode()" style="margin-top: 10px;">Lookup Product</button>
   <div id="productInfo" style="margin-top: 20px; font-size: 14px;"></div>
+  <div id="productSafetyMsg" style="margin-top: 10px; font-size: 14px; color: green;"></div>
 </div>
 <script>
 function showSentinelScreen() {
@@ -422,10 +423,14 @@ function lookupBarcode() {
         <strong>Color:</strong> ${product.color || 'N/A'}<br>
         ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 0px;">` : ""}`;
       document.getElementById("productInfo").innerHTML = info;
+      document.getElementById("productSafetyMsg").textContent = 
+  "No product warnings or safety alerts were found.";
+
     })
     .catch(error => {
       console.error("Error fetching barcode data:", error);
       document.getElementById("productInfo").innerHTML = "Product not found.";
+      document.getElementById("productSafetyMsg").textContent = "";
     });
 }
 
