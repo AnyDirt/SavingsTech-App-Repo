@@ -384,22 +384,19 @@ function shareApp() {
   <input type="text" id="barcodeInput" placeholder="Enter 12-digit barcode" maxlength="12" style="margin-top: 0px; font-size: 16px; padding: 6px; width: 200px;"><br>
   <button onclick="lookupBarcode()" style="margin-top: 10px;">Lookup Product</button>
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
-  <div id="productSafetyMsg" style="margin-top: -15px; font-size: 12px; color: green;"></div>
-  <!-- Prompt for card benefits -->
-  <div id="benefitsPrompt" style="display: none; margin-top: 10px;">
-    <p style="font-size: 14px;">File for eligible card benefits and manufacturer’s warranty?</p>
-    <button style="display: inline-block; margin: 5px;" onclick="handleBenefitsResponse('yes')">Yes</button>
-    <button style="display: inline-block; margin: 5px;" onclick="handleBenefitsResponse('no')">No</button>
-  </div>
-
-  <!-- Promo message and quote button -->
-  <div id="insurancePromo" style="display: none; margin-top: 5px;">
-    <p style="font-size: 14px; color: #0070C0; font-style: italic;">
-      Get affordable coverage for all your belongings with renters or homeowners insurance.
-    </p>
-    <a href="https://www.karenatessmansf.com" target="_blank" style="text-decoration: none;">
-      <button style="margin-top: 0px;">Get a quote</button>
-    </a>
+  <div id="barcodeFollowup" style="margin-top: 20px; font-size: 14px; display: none;">
+    <p style="color: green;">Great news! No product warnings or safety alerts were found.</p>
+    <p style="margin: 10px 0;">File for eligible card benefits and manufacturer’s warranty?</p>
+    <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px;">Yes</button>
+    <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px;">No</button>
+    <div style="margin-top: 15px;">
+      <p style="font-size: 13px; font-style: italic; color: #0070C0; margin-bottom: 5px;">
+        Get affordable coverage for all your belongings with renters or homeowners insurance.
+      </p>
+      <a href="https://www.karenatessmansf.com" target="_blank" style="text-decoration: none;">
+        <button style="margin-top: 5px;">Get a quote</button>
+      </a>
+    </div>
   </div>
 </div>
 <script>
@@ -453,20 +450,25 @@ function lookupBarcode() {
         <strong>   Color:</strong> ${product.color || 'N/A'}<br>
         ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 0px;">` : ""}`;
       document.getElementById("productInfo").innerHTML = info;
-      document.getElementById("productSafetyMsg").textContent = "No product warnings or safety alerts found.";
-      document.getElementById("benefitsPrompt").style.display = "block";
-      document.getElementById("insurancePromo").style.display = "none"; // hide promo until a button is clicked
+      document.getElementById('barcodeFollowup').style.display = 'block';
 
     })
     .catch(error => {
       console.error("Error fetching barcode data:", error);
       document.getElementById("productInfo").innerHTML = "Product not found.";
-      document.getElementById("productSafetyMsg").textContent = "";
-      document.getElementById("benefitsPrompt").style.display = "none";
-      document.getElementById("insurancePromo").style.display = "none";
+      document.getElementById('barcodeFollowup').style.display = 'none'; // hide follow-up if not found
 
     });
 }
+
+function handleWarrantyYes() {
+    alert("You selected Yes. Further logic to be implemented.");
+}
+
+function handleWarrantyNo() {
+    document.getElementById('barcodeFollowup').style.display = 'none';
+}
+
 
 document.addEventListener('touchstart', handleTouchStart, false);
 document.addEventListener('touchend', handleTouchEnd, false);
