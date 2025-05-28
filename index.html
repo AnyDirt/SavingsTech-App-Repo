@@ -328,25 +328,30 @@ function closeCardForm() {
                         const promoMsg = document.getElementById("promoMessage");
                         const promoBtn = document.getElementById("promoButton");
 
-                        if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
-                            promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn’t.";
-                            document.getElementById("promoSubMessage").textContent = "";
-                            promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
-                            promoBtn.firstElementChild.textContent = "Get a quote";
-                        } else if (categoryId % 2 === 1) {
-                            promoMsg.textContent = "Get affordable life insurance in minutes";
-                            document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
-                            // promoBtn.href = "https://www.prudential-lifeplans.com/life-insurance?afid=526342&tfn=ODMzLTIxNi05NDQ3&utm_source=prudential.com&utm_medium=referral";
-                            promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
-                            promoBtn.firstElementChild.textContent = "Get a quote";
-                        } else {
-                            promoMsg.textContent = "You're about to retire. Now what?";
-                            document.getElementById("promoSubMessage").textContent = "";
-                            // promoBtn.href = "https://www.prudential.com/landing/now-what";
-                            promoBtn.href = "https://www.karenatessmansf.com";
-                            promoBtn.firstElementChild.textContent = "See details →";
-                        }
-                        promo.style.display = "block";
+                        if (!document.getElementById("sentinelScreen").style.display.includes("block")) {
+                          if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
+                              promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn’t.";
+                              document.getElementById("promoSubMessage").textContent = "";
+                              promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
+                              promoBtn.firstElementChild.textContent = "Get a quote";
+                          } else if (categoryId % 2 === 1) {
+                              promoMsg.textContent = "Get affordable life insurance in minutes";
+                              document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
+                              // promoBtn.href = "https://www.prudential-lifeplans.com/life-insurance?afid=526342&tfn=ODMzLTIxNi05NDQ3&utm_source=prudential.com&utm_medium=referral";
+                              promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
+                              promoBtn.firstElementChild.textContent = "Get a quote";
+                          } else {
+                              promoMsg.textContent = "You're about to retire. Now what?";
+                              document.getElementById("promoSubMessage").textContent = "";
+                              // promoBtn.href = "https://www.prudential.com/landing/now-what";
+                              promoBtn.href = "https://www.karenatessmansf.com";
+                              promoBtn.firstElementChild.textContent = "See details →";
+                          }
+      
+                          promoMsg.style.display = "block";
+                          promoButton.style.display = "inline-block";
+                        }                  
+
                     } else {
                         document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
                     }
@@ -396,7 +401,6 @@ function shareApp() {
       <button style="margin-top: 0px;">Get a quote</button>
     </a>
   </div>
-
 </div>
 <script>
 function showSentinelScreen() {
