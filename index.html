@@ -412,6 +412,7 @@ function lookupBarcode() {
       console.log("API response:", data);
       if (!data.products || !data.products.length) {
         document.getElementById("productInfo").innerHTML = "Product not found.";
+        document.getElementById("productSafetyMsg").textContent = "";
         return;
       }
       const product = data.products[0];
