@@ -384,14 +384,14 @@ function shareApp() {
   <input type="text" id="barcodeInput" placeholder="Enter 12-digit barcode" maxlength="12" style="margin-top: 0px; font-size: 16px; padding: 6px; width: 200px;"><br>
   <button onclick="lookupBarcode()" style="margin-top: 10px;">Lookup Product</button>
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
-  <div id="barcodeFollowup" style="margin-top: 20px; font-size: 14px; display: none;">
-    <p style="color: green;">Great news! No product warnings or safety alerts were found.</p>
+  <div id="barcodeFollowup" style="margin-top: -10px; font-size: 14px; display: none;">
+    <p style="color: green;">No product warnings or safety alerts found.</p>
     <p style="margin: 10px 0;">File for eligible card benefits and manufacturer’s warranty?</p>
     <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px;">Yes</button>
     <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px;">No</button>
-    <div style="margin-top: 15px;">
-      <p style="font-size: 13px; font-style: italic; color: #0070C0; margin-bottom: 5px;">
-        Get affordable coverage for all your belongings with renters or homeowners insurance.
+    <div style="margin-top: 10px;">
+      <p style="font-size: 12px; font-style: italic; color: #0070C0; margin-bottom: 5px;">
+        Get affordable coverage for all your belongings
       </p>
       <a href="https://www.karenatessmansf.com" target="_blank" style="text-decoration: none;">
         <button style="margin-top: 5px;">Get a quote</button>
@@ -446,7 +446,7 @@ function lookupBarcode() {
         <strong>Brand:</strong> ${product.brand || 'N/A'}<br>
         <strong>Model:</strong> ${product.model || 'N/A'}
         <strong>   Color:</strong> ${product.color || 'N/A'}<br>
-        ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 0px;">` : ""}`;
+        ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: -10px;">` : ""}`;
       document.getElementById("productInfo").innerHTML = info;
       document.getElementById('barcodeFollowup').style.display = 'block';
 
