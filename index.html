@@ -420,7 +420,7 @@ function lookupBarcode() {
         <strong>Brand:</strong> ${product.brand || 'N/A'}<br>
         <strong>Model:</strong> ${product.model || 'N/A'}<br>
         <strong>Color:</strong> ${product.color || 'N/A'}<br>
-        ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 10px;">` : ""}`;
+        ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 0px;">` : ""}`;
       document.getElementById("productInfo").innerHTML = info;
     })
     .catch(error => {
