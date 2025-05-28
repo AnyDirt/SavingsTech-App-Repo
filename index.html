@@ -380,6 +380,23 @@ function shareApp() {
   <button onclick="lookupBarcode()" style="margin-top: 10px;">Lookup Product</button>
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="productSafetyMsg" style="margin-top: -5px; font-size: 12px; color: green;"></div>
+  <!-- Prompt for card benefits -->
+  <div id="benefitsPrompt" style="display: none; margin-top: 15px;">
+    <p style="font-size: 14px;">File for eligible card benefits and manufacturer’s warranty?</p>
+    <button style="display: inline-block; margin: 5px;" onclick="handleBenefitsResponse('yes')">Yes</button>
+    <button style="display: inline-block; margin: 5px;" onclick="handleBenefitsResponse('no')">No</button>
+  </div>
+
+  <!-- Promo message and quote button -->
+  <div id="insurancePromo" style="display: none; margin-top: 20px;">
+    <p style="font-size: 14px; color: #0070C0; font-style: italic;">
+      Get affordable coverage for all your belongings with renters or homeowners insurance.
+    </p>
+    <a href="https://www.karenatessmansf.com" target="_blank" style="text-decoration: none;">
+      <button style="margin-top: 5px;">Get a quote</button>
+    </a>
+  </div>
+<div id="productInfo" style="margin-top: 20px; font-size: 14px;"></div>
 </div>
 <script>
 function showSentinelScreen() {
@@ -399,6 +416,12 @@ function showSentinelScreen() {
   document.getElementById("insurancePromo").style.display = "none";
 }
 
+function handleBenefitsResponse(response) {
+  if (response === 'yes' || response === 'no') {
+    document.getElementById("insurancePromo").style.display = "block";
+  }
+}
+
 function lookupBarcode() {
   const barcode = document.getElementById("barcodeInput").value;
   if (barcode.length !== 12) {
@@ -413,6 +436,8 @@ function lookupBarcode() {
       if (!data.products || !data.products.length) {
         document.getElementById("productInfo").innerHTML = "Product not found.";
         document.getElementById("productSafetyMsg").textContent = "";
+        document.getElementById("benefitsPrompt").style.display = "none";
+        document.getElementById("insurancePromo").style.display = "none";
         return;
       }
       const product = data.products[0];
@@ -424,14 +449,18 @@ function lookupBarcode() {
         <strong>   Color:</strong> ${product.color || 'N/A'}<br>
         ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 0px;">` : ""}`;
       document.getElementById("productInfo").innerHTML = info;
-      document.getElementById("productSafetyMsg").textContent = 
-  "No product warnings or safety alerts found.";
+      document.getElementById("productSafetyMsg").textContent = "No product warnings or safety alerts found.";
+      document.getElementById("benefitsPrompt").style.display = "block";
+      document.getElementById("insurancePromo").style.display = "none"; // hide promo until a button is clicked
 
     })
     .catch(error => {
       console.error("Error fetching barcode data:", error);
       document.getElementById("productInfo").innerHTML = "Product not found.";
       document.getElementById("productSafetyMsg").textContent = "";
+      document.getElementById("benefitsPrompt").style.display = "none";
+      document.getElementById("insurancePromo").style.display = "none";
+
     });
 }
 
