@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Infini Top Card by SavingsTech</title>
+    <title>Infini App by SavingsTech</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,7 +84,7 @@
         <button onclick="registerCreditCards()" style="width: 160px; font-size: 13px;">Enter Credit Cards By Program Name</button>
         <button onclick="shareApp()" style="width: 160px; font-size: 12.5px;">Share App with Neighbors & Friends</button>
     </div>
-    <h1 id="nearestPlaceHeading" style="font-size: 28px; display: none; margin-top: 0px;">Top Card<sup style="font-size: 30%; vertical-align: super;">™</sup></h1>
+    <h1 id="nearestPlaceHeading" style="font-size: 30px; display: none; margin-top: 0px;">Top Card<sup style="font-size: 30%; vertical-align: super;">™</sup></h1>
     <div id="phoneEntry" style="margin-top: 50px;">
         <p>Enter your mobile number to start:</p>
         <input type="tel" id="phoneNumber" placeholder="Enter phone number">
@@ -369,7 +369,7 @@ function shareApp() {
 
   if (navigator.share) {
     navigator.share({
-      title: "Infini Top Card by SavingsTech",
+      title: "Infini App by SavingsTech",
       text: shareText,
       url: shareUrl
     }).catch(err => console.log("Share canceled or failed:", err));
