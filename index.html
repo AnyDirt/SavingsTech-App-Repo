@@ -321,6 +321,9 @@ function closeCardForm() {
 
                         // Swipe left to Sentinel if categoryId is in retail ranges
 
+                        const promo = document.getElementById("insurancePromo");
+                        const promoMsg = document.getElementById("promoMessage");
+                        const promoBtn = document.getElementById("promoButton");
                         const categoryId = nearest.categories[0]?.id || 0;
                         showRewardCard(categoryId);
 
