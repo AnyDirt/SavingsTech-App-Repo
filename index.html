@@ -321,35 +321,39 @@ function closeCardForm() {
 
                         // Swipe left to Sentinel if categoryId is in retail ranges
 
-                        rewardImage.src = categoryId % 2 === 1 ? "Top_Cards_1.PNG" : "Top_Cards_2.PNG";
-                        rewardImage.style.display = "block";
+                        const categoryId = nearest.categories[0]?.id || 0;
+                        showRewardCard(categoryId);
 
-                        const promo = document.getElementById("insurancePromo");
-                        const promoMsg = document.getElementById("promoMessage");
-                        const promoBtn = document.getElementById("promoButton");
-
-                        if (!document.getElementById("sentinelScreen").style.display.includes("block")) {
-                          if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
-                              promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn’t.";
-                              document.getElementById("promoSubMessage").textContent = "";
-                              promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
-                              promoBtn.firstElementChild.textContent = "Get a quote";
-                          } else if (categoryId % 2 === 1) {
-                              promoMsg.textContent = "Get affordable life insurance in minutes";
-                              document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
-                              // promoBtn.href = "https://www.prudential-lifeplans.com/life-insurance?afid=526342&tfn=ODMzLTIxNi05NDQ3&utm_source=prudential.com&utm_medium=referral";
-                              promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
-                              promoBtn.firstElementChild.textContent = "Get a quote";
-                          } else {
-                              promoMsg.textContent = "You're already taking care of loved ones.";
-                              document.getElementById("promoSubMessage").textContent = "Let life insurance help carry the load.";
-                              // promoBtn.href = "https://www.prudential.com/landing/now-what";
-                              promoBtn.href = "https://www.karenatessmansf.com";
-                              promoBtn.firstElementChild.textContent = "Learn more →";
-                          }
-      
-                          promoMsg.style.display = "block";
-                          promoButton.style.display = "inline-block";
+//2 new lines above
+//                        rewardImage.src = categoryId % 2 === 1 ? "Top_Cards_1.PNG" : "Top_Cards_2.PNG";
+//                        rewardImage.style.display = "block";
+//
+//                        const promo = document.getElementById("insurancePromo");
+//                        const promoMsg = document.getElementById("promoMessage");
+//                        const promoBtn = document.getElementById("promoButton");
+//
+//                        if (!document.getElementById("sentinelScreen").style.display.includes("block")) {
+//                          if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
+//                              promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn’t.";
+//                              document.getElementById("promoSubMessage").textContent = "";
+//                              promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
+//                              promoBtn.firstElementChild.textContent = "Get a quote";
+//                          } else if (categoryId % 2 === 1) {
+//                              promoMsg.textContent = "Get affordable life insurance in minutes";
+//                              document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
+//                              // promoBtn.href = "https://www.prudential-lifeplans.com/life-insurance?afid=526342&tfn=ODMzLTIxNi05NDQ3&utm_source=prudential.com&utm_medium=referral";
+//                              promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
+//                              promoBtn.firstElementChild.textContent = "Get a quote";
+//                          } else {
+//                              promoMsg.textContent = "You're already taking care of loved ones.";
+//                              document.getElementById("promoSubMessage").textContent = "Let life insurance help carry the load.";
+//                              // promoBtn.href = "https://www.prudential.com/landing/now-what";
+//                              promoBtn.href = "https://www.karenatessmansf.com";
+//                              promoBtn.firstElementChild.textContent = "Learn more →";
+//                          }
+//      
+//                          promoMsg.style.display = "block";
+//                          promoButton.style.display = "inline-block";
                         }                  
 
                     } else {
@@ -363,6 +367,36 @@ function closeCardForm() {
                 document.getElementById("nearestPlace").innerText = "Error fetching places: " + error;
             });
         }
+
+
+function showRewardCard(categoryId) {
+  const rewardImage = document.getElementById("rewardCards");
+  if (!rewardImage) return;
+
+  if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
+    rewardImage.src = "Top_Cards_2.PNG";    
+    document.getElementById("promoMsg").textContent = "Your next road trip could be unpredictable. Make sure your coverage isn’t.";
+    document.getElementById("promoSubMsg").textContent = "";
+    document.getElementById("promoButton").href = "https://www.karenatessmansf.com/insurance/auto";
+    document.getElementById("promoButton").innerHTML = "Get a quote";
+  } else if (categoryId % 2 === 1) {
+    rewardImage.src = "Top_Cards_1.PNG";
+    document.getElementById("promoMsg").textContent = "Get affordable life insurance in minutes";
+    document.getElementById("promoSubMsg").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
+    document.getElementById("promoButton").href = "https://www.prudential-lifeplans.com/life-insurance?afid=526342&tfn=ODMzLTIxNi05NDQ3&utm_source=prudential.com&utm_medium=referral";
+    document.getElementById("promoButton").innerHTML = "Get a quote";
+  } else {
+    rewardImage.src = "Top_Cards_2.PNG";
+    document.getElementById("promoMsg").textContent = "You're about to retire. Now what?";
+    document.getElementById("promoSubMsg").textContent = "";
+    document.getElementById("promoButton").href = "https://www.prudential.com/landing/now-what";
+    document.getElementById("promoButton").innerHTML = "See details →";
+  }
+  rewardImage.style.display = "block";
+  document.getElementById("promoContainer").style.display = "block";
+}
+
+
 function shareApp() {
   const shareText = "Maximize credit card rewards effortlessly with this mobile app. Sponsored by your State Farm agent to help you start saving smarter!";
   const shareUrl = window.location.href;
