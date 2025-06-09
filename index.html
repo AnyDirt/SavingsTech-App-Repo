@@ -328,7 +328,7 @@ function closeCardForm() {
                         const promoMsg = document.getElementById("promoMessage");
                         const promoBtn = document.getElementById("promoButton");
 
-                        if (!document.getElementById("sentinelScreen").style.display.includes("block")) {
+//reg                   if (!document.getElementById("sentinelScreen").style.display.includes("block")) {
                           if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
                               promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn’t.";
                               document.getElementById("promoSubMessage").textContent = "";
@@ -350,7 +350,7 @@ function closeCardForm() {
       
                           promoMsg.style.display = "block";
                           promoButton.style.display = "inline-block";
-                        }                  
+//reg                   }                  
 
                     } else {
                         document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
