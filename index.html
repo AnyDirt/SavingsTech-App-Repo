@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Top Card App by SavingsTech</title>
+    <script src="https://unpkg.com/@ericblade/quagga2@v0.0.10/dist/quagga.min.js"></script>  
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -68,6 +69,16 @@
         #getPlaceButton {
             display: none;
             text-align: center;
+        }
+        #scannerContainer {
+            display: none;
+            margin-top: 15px;
+        }
+        #scannerPreview {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
@@ -381,12 +392,25 @@ function shareApp() {
   }
 }
     </script>
-<div id="sentinelScreen" style="display: none; text-align: center; padding: 20px;">
+// <div id="sentinelScreen" style="display: none; text-align: center; padding: 20px;">
+//   <h1 style="margin-top: -25px; font-size: 30px; margin-bottom: 0px;">Sentinel<sup style="font-size: 40%; vertical-align: super;">™</sup></h1>
+//   <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Protect your card purchases</p>
+//   <input type="text" id="barcodeInput" placeholder="Enter 12-digit barcode" maxlength="12" style="margin-top: 0px; font-size: 16px; padding: 6px; width: 170px;"><br>
+//   <button onclick="lookupBarcode()" style="margin-top: 10px;">Look Up Product</button>
+
+<div id="sentinelScreen" style="display: block; text-align: center; padding: 20px;">
   <h1 style="margin-top: -25px; font-size: 30px; margin-bottom: 0px;">Sentinel<sup style="font-size: 40%; vertical-align: super;">™</sup></h1>
   <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Protect your card purchases</p>
   <input type="text" id="barcodeInput" placeholder="Enter 12-digit barcode" maxlength="12" style="margin-top: 0px; font-size: 16px; padding: 6px; width: 170px;"><br>
   <button onclick="lookupBarcode()" style="margin-top: 10px;">Look Up Product</button>
+  <button id="scanBarcodeBtn" onclick="startScanner()" style="margin-top: 10px;">Scan for Barcode</button>
+  <button id="cancelScanBtn" onclick="stopScanner()" style="display:none;">Cancel Scan</button>
+  <div id="scannerContainer">
+    <div id="scannerPreview"></div>
+  </div>
+
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
+  
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
     <p style="color: green; font-size: 11px;">No recalls or safety alerts found</p>
     <p style="margin: 10px 0; font-size: 16px;">Register for eligible card benefits and manufacturer’s warranty?</p>
@@ -426,12 +450,19 @@ function handleBenefitsResponse(response) {
   }
 }
 
-function lookupBarcode() {
-  const barcode = document.getElementById("barcodeInput").value;
-  if (barcode.length !== 12) {
-    alert("Please enter a valid 12-digit barcode.");
-    return;
-  }
+// function lookupBarcode() {
+//   const barcode = document.getElementById("barcodeInput").value;
+//   if (barcode.length !== 12) {
+//     alert("Please enter a valid 12-digit barcode.");
+//     return;
+//   }
+
+function lookupBarcode(upcOverride) {
+   const barcode = upcOverride || document.getElementById("barcodeInput").value;
+   if (barcode.length !== 12) {
+     alert("Please enter a valid 12-digit barcode.");
+     return;
+   }
   const url = `/.netlify/functions/barcode?barcode=${barcode}`;
   fetch(url)
     .then(res => res.json())
@@ -460,6 +491,48 @@ function lookupBarcode() {
       document.getElementById('barcodeFollowup').style.display = 'none'; // hide follow-up if not found
 
     });
+}
+
+function startScanner() {
+  document.getElementById('scannerContainer').style.display = 'block';
+  document.getElementById('cancelScanBtn').style.display = 'inline';
+  Quagga.init({
+    inputStream: {
+      name: "Live",
+      type: "LiveStream",
+      target: document.querySelector('#scannerPreview'),
+      constraints: {
+        facingMode: "environment"
+      }
+    },
+    decoder: {
+      readers: ["upc_reader"]
+    }
+  }, function(err) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    Quagga.start();
+  });
+
+  Quagga.onDetected(onBarcodeDetected);
+}
+
+function stopScanner() {
+  Quagga.stop();
+  Quagga.offDetected(onBarcodeDetected);
+  document.getElementById('scannerContainer').style.display = 'none';
+  document.getElementById('cancelScanBtn').style.display = 'none';
+}
+
+function onBarcodeDetected(result) {
+  const code = result.codeResult.code;
+  if (/^\d{12}$/.test(code)) {
+    stopScanner();
+    document.getElementById('barcodeInput').value = code;
+    lookupBarcode(code);
+  }
 }
 
 function handleWarrantyYes() {
