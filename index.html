@@ -91,6 +91,7 @@
     </style>
 </head>
 <body>
+    <audio id="beepSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
     <img src="infini_logo_png.png" alt="App Logo" class="logo">
     <div class="menu" onclick="toggleMenu()">
         <div></div>
@@ -524,6 +525,7 @@ function stopScanner() {
 function onBarcodeDetected(result) {
   const code = result.codeResult.code;
   if (/^\d{12}$/.test(code)) {
+    document.getElementById("beepSound").play();
     stopScanner();
     document.getElementById('barcodeInput').value = code;
     lookupBarcode(code);
