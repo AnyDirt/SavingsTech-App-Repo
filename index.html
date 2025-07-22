@@ -410,7 +410,9 @@ function shareApp() {
   <button id="scanBarcodeBtn" onclick="startScanner()" style="margin-top: 10px;">Scan for Barcode</button>
   <button id="cancelScanBtn" onclick="stopScanner()" style="display:none;">Cancel Scan</button>
   <div id="scannerContainer">
-    <div id="scannerPreview"></div>
+    <div id="scannerPreview" style="position: relative;">
+      <div style="position: absolute; top: 40%; left: 10%; width: 80%; height: 20%; border: 2px dashed red; z-index: 10;"></div>
+    </div>
   </div>
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
