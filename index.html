@@ -498,12 +498,34 @@ function startScanner() {
       type: "LiveStream",
       target: document.querySelector('#scannerPreview'),
       constraints: {
-        facingMode: "environment"
+        facingMode: { exact: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+      // constraints: {
+        // facingMode: "environment"
+      // }
+    },
+
+    decoder: {
+      readers: ["upc_reader"],
+      debug: {
+        drawBoundingBox: false,
+        showFrequency: false,
+        drawScanline: false,
+        showPattern: false
       }
     },
-    decoder: {
-      readers: ["upc_reader"]
-    }
+    locator: {
+      patchSize: "medium", // x-small | small | medium | large | x-large
+      halfSample: true
+    },
+    numOfWorkers: navigator.hardwareConcurrency || 4,
+    frequency: 5
+
+    // decoder: {
+      // readers: ["upc_reader"]
+    // }
   }, function(err) {
     if (err) {
       console.error(err);
@@ -525,14 +547,14 @@ function stopScanner() {
 function onBarcodeDetected(result) {
   const code = result.codeResult.code;
   if (/^\d{12}$/.test(code)) {
-    // document.getElementById("beepSound").play();
-    const beepAudio = document.getElementById("beepSound");
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioCtx.createMediaElementSource(beepAudio);
-    const gainNode = audioCtx.createGain();
-    gainNode.gain.value = 2.5; // increase volume (1.0 is default)
-    source.connect(gainNode).connect(audioCtx.destination);
-    beepAudio.play();
+    document.getElementById("beepSound").play();
+    // const beepAudio = document.getElementById("beepSound");
+    // const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // const source = audioCtx.createMediaElementSource(beepAudio);
+    // const gainNode = audioCtx.createGain();
+    // gainNode.gain.value = 2.5; // increase volume (1.0 is default)
+    // source.connect(gainNode).connect(audioCtx.destination);
+    // beepAudio.play();
     stopScanner();
     document.getElementById('barcodeInput').value = code;
     lookupBarcode(code);
