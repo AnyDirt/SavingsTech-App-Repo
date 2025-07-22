@@ -525,7 +525,14 @@ function stopScanner() {
 function onBarcodeDetected(result) {
   const code = result.codeResult.code;
   if (/^\d{12}$/.test(code)) {
-    document.getElementById("beepSound").play();
+    // document.getElementById("beepSound").play();
+    const beepAudio = document.getElementById("beepSound");
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaElementSource(beepAudio);
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = 2.5; // increase volume (1.0 is default)
+    source.connect(gainNode).connect(audioCtx.destination);
+    beepAudio.play();
     stopScanner();
     document.getElementById('barcodeInput').value = code;
     lookupBarcode(code);
