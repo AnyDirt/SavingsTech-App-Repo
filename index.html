@@ -477,7 +477,7 @@ function lookupBarcode(upcOverride) {
         <strong>Manufacturer:</strong> ${product.manufacturer || 'N/A'}<br>
         <strong>Brand:</strong> ${product.brand || 'N/A'}<br>
         <strong>Model:</strong> ${product.model || 'N/A'}
-        <strong>   Color:</strong> ${product.color || 'N/A'}<br>
+        <strong>   Category:</strong> ${product.category || 'N/A'}<br>
         ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 5px;">` : ""}`;
       document.getElementById("productInfo").innerHTML = info;
       document.getElementById('barcodeFollowup').style.display = 'block';
