@@ -490,8 +490,15 @@ function shareApp() {
         }
 
         function navigateTo(screen) {
+            // Close the dropdown menu
+            document.getElementById("menuDropdown").style.display = "none";
+
+            // Show/hide screens
             document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
+
+            // Add more screens here when you want to expand
         }
+
 
         function submitProfile() {
             const state = document.getElementById("stateSelect").value;
@@ -520,6 +527,12 @@ function shareApp() {
 
             alert("Profile submitted successfully!");
             console.log("Saved profile:", profileData);
+
+            document.getElementById("profileSetupScreen").style.display = "none";
+            document.getElementById("getPlaceButton").style.display = "block";
+            document.getElementById("nearestPlaceHeading").style.display = "block";
+            document.getElementById("output").style.display = "block";
+
         }
     </script>
 
