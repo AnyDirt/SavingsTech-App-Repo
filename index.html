@@ -62,6 +62,37 @@
             background-color: gray;
             cursor: not-allowed;
         }
+        .profile-setup {
+            display: none;
+            margin-top: 60px;
+        }
+        .form-section {
+            margin-bottom: 15px;
+        }
+        select, input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+            margin: 5px auto;
+        }
+        .checkbox-group {
+            text-align: left;
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+        .mobile-box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #f9f9f9;
+        }
+        #profileSetupScreen h2 {
+            margin-top: 0;
+        }
         #output {
             margin-top: 20px;
             font-size: 18px;
@@ -102,6 +133,7 @@
     <div class="menu-dropdown" id="menuDropdown">
         <button onclick="forgetPhoneNumber()" style="width: 160px; font-size: 13px;">Login with Mobile Number</button>
         <button onclick="registerCreditCards()" style="width: 160px; font-size: 13px;">Enter Credit Cards By Program Name</button>
+        <button onclick="navigateTo('profileSetup')">Set Up Profile for Safety Alerts</button>
         <button onclick="shareApp()" style="width: 160px; font-size: 12.5px;">Share App with Neighbors & Friends</button>
     </div>
     <h1 id="nearestPlaceHeading" style="font-size: 20px; display: none; margin-top: 0px;">Max Rewards</h1>
@@ -392,7 +424,7 @@ function shareApp() {
 
   if (navigator.share) {
     navigator.share({
-      title: "Top Card App by SavingsTech",
+      title: "Max App by SavingsTech",
       text: shareText,
       url: shareUrl
     }).catch(err => console.log("Share canceled or failed:", err));
@@ -401,6 +433,97 @@ function shareApp() {
   }
 }
     </script>
+
+    <div id="profileSetupScreen" class="profile-setup">
+        <div class="mobile-box">
+            <h2>Set Up Profile for Safety Alerts</h2>
+            <p>Set up your profile for notifications of safety alerts, product recalls, and investigations that you may need to know.</p>
+
+            <div class="form-section">
+                <label for="stateSelect">Select Your State:</label><br>
+                <select id="stateSelect">
+                    <option value="">--Select State--</option>
+                    <option value="AL">Alabama</option>
+                    <option value="AK">Alaska</option>
+                    <option value="AZ">Arizona</option>
+                    <option value="AR">Arkansas</option>
+                    <option value="CA">California</option>
+                    <option value="CO">Colorado</option>
+                    <!-- Add remaining states -->
+                </select>
+            </div>
+
+            <div class="form-section checkbox-group">
+                <label>Select all that apply:</label><br>
+                <input type="checkbox" id="student" name="profileType" value="Student"> Student<br>
+                <input type="checkbox" id="parent" name="profileType" value="Parent"> Parent<br>
+                <input type="checkbox" id="renter" name="profileType" value="Renter"> Renter<br>
+                <input type="checkbox" id="homeowner" name="profileType" value="Homeowner"> Homeowner<br>
+            </div>
+
+            <div class="form-section">
+                <label>Vehicle Information (up to 4):</label><br>
+                <div id="vehicleInputs">
+                    <input type="text" placeholder="Model Year">
+                    <input type="text" placeholder="Make">
+                    <input type="text" placeholder="Model"><br>
+                    <input type="text" placeholder="Model Year">
+                    <input type="text" placeholder="Make">
+                    <input type="text" placeholder="Model"><br>
+                    <input type="text" placeholder="Model Year">
+                    <input type="text" placeholder="Make">
+                    <input type="text" placeholder="Model"><br>
+                    <input type="text" placeholder="Model Year">
+                    <input type="text" placeholder="Make">
+                    <input type="text" placeholder="Model">
+                </div>
+            </div>
+
+            <button onclick="submitProfile()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const dropdown = document.getElementById("menuDropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        function navigateTo(screen) {
+            document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
+        }
+
+        function submitProfile() {
+            const state = document.getElementById("stateSelect").value;
+
+            const checkboxes = document.querySelectorAll('input[name="profileType"]:checked');
+            const profileTypes = Array.from(checkboxes).map(cb => cb.value);
+
+            const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
+            const vehicles = [];
+            for (let i = 0; i < vehicleInputs.length; i += 3) {
+                const year = vehicleInputs[i].value;
+                const make = vehicleInputs[i + 1].value;
+                const model = vehicleInputs[i + 2].value;
+                if (year || make || model) {
+                    vehicles.push({ year, make, model });
+                }
+            }
+
+            const profileData = {
+                state,
+                profileTypes,
+                vehicles
+            };
+
+            localStorage.setItem("userProfile", JSON.stringify(profileData));
+
+            alert("Profile submitted successfully!");
+            console.log("Saved profile:", profileData);
+        }
+    </script>
+
+
 
 <div id="sentinelScreen" style="display: none; text-align: center; padding: 20px;">
   <h1 style="margin-top: -25px; font-size: 20px; margin-bottom: 0px;">Max Benefits</h1>
