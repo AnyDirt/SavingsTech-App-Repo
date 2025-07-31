@@ -612,7 +612,7 @@ function shareApp() {
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="recallResult" style="margin-top: -15px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
-    <p style="color: green; font-weight: bold; font-size: 11px;">No recalls or safety alerts found</p>
+    <p style="color: green; font-weight: bold; font-size: 11px;">No Recalls or Safety Alerts found</p>
     <p style="margin: 10px 0; font-size: 16px;">Register for eligible card benefits and manufacturer’s warranty?</p>
     <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">Yes</button>
     <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">No</button>
@@ -666,6 +666,8 @@ function lookupBarcode(upcOverride) {
         document.getElementById("productInfo").innerHTML = "Product not found";
         document.getElementById('barcodeFollowup').style.display = 'none'; // hide follow-up if not found
         return;
+      } else {
+        checkRecall(scannedBarcode);
       }
       const product = data.products[0];
       const image = product.images && product.images.length > 0 ? product.images[0] : "";
