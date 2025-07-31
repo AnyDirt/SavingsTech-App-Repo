@@ -667,7 +667,7 @@ function lookupBarcode(upcOverride) {
         document.getElementById('barcodeFollowup').style.display = 'none'; // hide follow-up if not found
         return;
       } else {
-        checkRecall(scannedBarcode);
+        checkRecall(barcode);
       }
       const product = data.products[0];
       const image = product.images && product.images.length > 0 ? product.images[0] : "";
