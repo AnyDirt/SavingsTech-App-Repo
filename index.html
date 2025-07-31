@@ -121,6 +121,11 @@
             height: auto !important;
             max-width: 100%;
         }
+        #recallResult {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -605,6 +610,7 @@ function shareApp() {
     </div>
   </div>
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
+  <div id="recallResult" style="margin-top: -15px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
     <p style="color: green; font-weight: bold; font-size: 11px;">No recalls or safety alerts found</p>
     <p style="margin: 10px 0; font-size: 16px;">Register for eligible card benefits and manufacturer’s warranty?</p>
@@ -752,6 +758,29 @@ function onBarcodeDetected(result) {
     lookupBarcode(code);
   }
 }
+
+async function checkRecall(barcode) {
+    const resultDiv = document.getElementById("recallResult");
+    resultDiv.innerText = "";
+
+    try {
+        const response = await fetch(`https://www.saferproducts.gov/RestWebServices/Recall?format=json&RecallID=${barcode}`);
+        const data = await response.json();
+
+        if (data && data.length > 0 && data[0].Title) {
+            resultDiv.innerText = data[0].Title;
+            resultDiv.style.color = "red";
+        } else {
+            resultDiv.innerText = "No recalls or safety alerts found.";
+            resultDiv.style.color = "green";
+        }
+    } catch (error) {
+        console.error("Recall API error:", error);
+        resultDiv.innerText = "Unable to check recall information.";
+        resultDiv.style.color = "orange";
+    }
+}
+
 
 function handleWarrantyYes() {
     alert("You selected Yes. Further logic to be implemented.");
