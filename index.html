@@ -616,7 +616,7 @@ function shareApp() {
   </div>
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
-    <p style="color: green; font-weight: bold; font-size: 11px;">No Recalls or safety alerts found</p>
+    <p style="color: green; font-weight: bold; font-size: 11px;">No recalls or Safety Alerts found</p>
     <p style="margin: 10px 0; font-size: 16px;">Register for eligible card benefits and manufacturer’s warranty?</p>
     <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">Yes</button>
     <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">No</button>
@@ -821,6 +821,7 @@ function handleTouchEnd(evt) {
   } else if (xDiff < -50 && isSentinelVisible) {
     // Swipe right to return from Sentinel screen
     sentinelScreen.style.display = "none";
+    document.getElementById("maxAlertsScreen").style.display = "none";
     document.getElementById("dotTopCard").textContent = "●";
     document.getElementById("dotTopCard").style.color = "#0070C0";
     document.getElementById("dotSentinel").textContent = "○";
