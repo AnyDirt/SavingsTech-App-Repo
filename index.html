@@ -864,6 +864,16 @@ function handleTouchEnd(evt) {
     function navigateTo(screen) {
         document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
         document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
+        if (document.getElementById("maxAlertsScreen")?.style.display === "block") {
+            document.getElementById("sentinelScreen").style.display = "none";
+            document.getElementById("phoneEntry").style.display = "none";
+            document.getElementById("getPlaceButton").style.display = "none";
+            document.getElementById("nearestPlaceHeading").style.display = "none";
+            document.getElementById("output").style.display = "none";
+            document.getElementById("nearestPlace").style.display = "none";
+            document.getElementById("rewardCards").style.display = "none";
+            document.getElementById("insurancePromo").style.display = "none";
+        }
     }
 
     async function loadVehicleRecalls() {
