@@ -865,10 +865,9 @@ function handleTouchEnd(evt) {
     }
 
     function navigateTo(screen) {
-        document.getElementById("profileSetupScreen").style.display = screen === "profileSetup" ? "block" : "none";
-        document.getElementById("maxAlertsScreen").style.display = screen === "maxAlerts" ? "block" : "none";
-        if (screen === 'maxAlerts') {
-        // if (document.getElementById("maxAlertsScreen")?.style.display === "block") {
+        document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
+        document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
+        if (document.getElementById("maxAlertsScreen")?.style.display === "block") {
             document.getElementById("sentinelScreen").style.display = "none";
             document.getElementById("phoneEntry").style.display = "none";
             document.getElementById("getPlaceButton").style.display = "none";
