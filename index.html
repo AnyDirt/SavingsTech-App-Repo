@@ -858,6 +858,7 @@ function handleTouchEnd(evt) {
             // swipe left
             if (document.getElementById("sentinelScreen")?.style.display === "block") {
                 document.getElementById("sentinelScreen").style.display = "none";
+                document.getElementById("barcodeFollowup").style.display = "none";
                 navigateTo('maxAlerts');
                 loadVehicleRecalls();
             }
@@ -869,6 +870,7 @@ function handleTouchEnd(evt) {
         document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
         if (document.getElementById("maxAlertsScreen")?.style.display === "block") {
             document.getElementById("sentinelScreen").style.display = "none";
+            document.getElementById("barcodeFollowup").style.display = "none";
             document.getElementById("phoneEntry").style.display = "none";
             document.getElementById("getPlaceButton").style.display = "none";
             document.getElementById("nearestPlaceHeading").style.display = "none";
