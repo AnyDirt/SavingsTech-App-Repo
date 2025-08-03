@@ -155,7 +155,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 12:52</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -616,7 +616,7 @@ function shareApp() {
   </div>
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
-    <p style="color: green; font-weight: bold; font-size: 11px;">No recalls or Safety Alerts found</p>
+    <p style="color: green; font-weight: bold; font-size: 11px;">No Recalls or safety alerts found</p>
     <p style="margin: 10px 0; font-size: 16px;">Register for eligible card benefits and manufacturer’s warranty?</p>
     <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">Yes</button>
     <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">No</button>
@@ -821,7 +821,6 @@ function handleTouchEnd(evt) {
   } else if (xDiff < -50 && isSentinelVisible) {
     // Swipe right to return from Sentinel screen
     sentinelScreen.style.display = "none";
-    document.getElementById("maxAlertsScreen").style.display = "none";
     document.getElementById("dotTopCard").textContent = "●";
     document.getElementById("dotTopCard").style.color = "#0070C0";
     document.getElementById("dotSentinel").textContent = "○";
@@ -858,7 +857,6 @@ function handleTouchEnd(evt) {
             // swipe left
             if (document.getElementById("sentinelScreen")?.style.display === "block") {
                 document.getElementById("sentinelScreen").style.display = "none";
-                document.getElementById("barcodeFollowup").style.display = "none";
                 navigateTo('maxAlerts');
                 loadVehicleRecalls();
             }
@@ -870,7 +868,6 @@ function handleTouchEnd(evt) {
         document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
         if (document.getElementById("maxAlertsScreen")?.style.display === "block") {
             document.getElementById("sentinelScreen").style.display = "none";
-            document.getElementById("barcodeFollowup").style.display = "none";
             document.getElementById("phoneEntry").style.display = "none";
             document.getElementById("getPlaceButton").style.display = "none";
             document.getElementById("nearestPlaceHeading").style.display = "none";
