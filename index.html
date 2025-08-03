@@ -155,7 +155,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 3:56pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0417</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -197,6 +197,9 @@
 
 
 function registerCreditCards() {
+    // Close the dropdown menu
+    document.getElementById("menuDropdown").style.display = "none";
+    
     const formContainer = document.createElement("div");
     formContainer.innerHTML = `
         <div id="cardForm" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: #fff; padding: 20px; border: 1px solid #ccc; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 9999;">
@@ -552,10 +555,11 @@ function shareApp() {
             // Close the dropdown menu
             document.getElementById("menuDropdown").style.display = "none";
 
-            // Show/hide screens
             if (screen === 'profileSetup') {
+                // Show profile setup screen
                 document.getElementById("profileSetupScreen").style.display = "block";
-                // Hide all other main screens when showing profile setup
+                
+                // Hide ALL other screens and elements
                 document.getElementById("sentinelScreen").style.display = "none";
                 document.getElementById("maxAlertsScreen").style.display = "none";
                 document.getElementById("phoneEntry").style.display = "none";
@@ -566,14 +570,14 @@ function shareApp() {
                 document.getElementById("rewardCards").style.display = "none";
                 document.getElementById("insurancePromo").style.display = "none";
                 document.getElementById("screenIndicator").style.display = "none";
-                // Scroll to top when showing profile setup
+                
+                // Scroll to top
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
             } else {
                 document.getElementById("profileSetupScreen").style.display = "none";
             }
         }
-
 
         function submitProfile() {
             const state = document.getElementById("stateSelect").value;
@@ -603,11 +607,24 @@ function shareApp() {
             alert("Profile submitted successfully!");
             console.log("Saved profile:", profileData);
 
+            // Hide profile setup screen
             document.getElementById("profileSetupScreen").style.display = "none";
-            document.getElementById("getPlaceButton").style.display = "block";
-            document.getElementById("nearestPlaceHeading").style.display = "block";
-            document.getElementById("output").style.display = "block";
-
+            
+            // Show phone entry screen (login screen)
+            document.getElementById("phoneEntry").style.display = "block";
+            
+            // Hide all other elements
+            document.getElementById("getPlaceButton").style.display = "none";
+            document.getElementById("nearestPlaceHeading").style.display = "none";
+            document.getElementById("output").style.display = "none";
+            document.getElementById("nearestPlace").style.display = "none";
+            document.getElementById("rewardCards").style.display = "none";
+            document.getElementById("insurancePromo").style.display = "none";
+            document.getElementById("screenIndicator").style.display = "none";
+            
+            // Scroll to top
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
         }
     </script>
 
