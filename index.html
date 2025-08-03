@@ -155,7 +155,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 12:55pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1:28pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -840,7 +840,7 @@ function handleTouchEnd(evt) {
 
 
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 20px;">
-    <h2>Max Alerts</h2>
+    <h1 style="margin-top: -25px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
     <div id="alertsContainer"></div>
 </div>
 
@@ -870,6 +870,7 @@ function handleTouchEnd(evt) {
         document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
         if (document.getElementById("maxAlertsScreen")?.style.display === "block") {
             document.getElementById("sentinelScreen").style.display = "none";
+            document.getElementById("productInfo").style.display = "none";
             document.getElementById("barcodeFollowup").style.display = "none";
             document.getElementById("phoneEntry").style.display = "none";
             document.getElementById("getPlaceButton").style.display = "none";
