@@ -143,10 +143,10 @@
         <span>Menu</span>
     </div>
     <div class="menu-dropdown" id="menuDropdown">
-        <button onclick="forgetPhoneNumber()" style="width: 160px; font-size: 13px;">Login with Mobile Number</button>
-        <button onclick="registerCreditCards()" style="width: 160px; font-size: 13px;">Enter Credit Cards By Program Name</button>
-        <button onclick="navigateTo('profileSetup')" style="width: 160px; font-size: 13px;">Set Up Profile for Safety Alerts</button>
-        <button onclick="shareApp()" style="width: 160px; font-size: 12.5px;">Share App with Neighbors & Friends</button>
+        <button onclick="forgetPhoneNumber(); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 13px;">Login with Mobile Number</button>
+        <button onclick="registerCreditCards(); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 13px;">Enter Credit Cards By Program Name</button>
+        <button onclick="navigateTo('profileSetup'); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 13px;">Set Up Profile for Safety Alerts</button>
+        <button onclick="shareApp(); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 12.5px;">Share App with Neighbors & Friends</button>
     </div>
     <h1 id="nearestPlaceHeading" style="font-size: 20px; display: none; margin-top: 0px;">Max Rewards</h1>
     <div id="phoneEntry" style="margin-top: 50px;">
@@ -155,7 +155,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0417</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0431pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -197,9 +197,6 @@
 
 
 function registerCreditCards() {
-    // Close the dropdown menu
-    document.getElementById("menuDropdown").style.display = "none";
-    
     const formContainer = document.createElement("div");
     formContainer.innerHTML = `
         <div id="cardForm" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: #fff; padding: 20px; border: 1px solid #ccc; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 9999;">
@@ -434,9 +431,6 @@ function closeCardForm() {
             });
         }
 function shareApp() {
-  // Close the dropdown menu
-  document.getElementById("menuDropdown").style.display = "none";
-  
   const shareText = "Maximize card rewards effortlessly with this mobile app. Sponsored by Karen Tessman, State Farm agent, to help you spend smart and save!";
   const shareUrl = window.location.href;
 
@@ -552,9 +546,6 @@ function shareApp() {
         }
 
         function navigateTo(screen) {
-            // Close the dropdown menu
-            document.getElementById("menuDropdown").style.display = "none";
-
             if (screen === 'profileSetup') {
                 // Show profile setup screen
                 document.getElementById("profileSetupScreen").style.display = "block";
@@ -908,8 +899,9 @@ document.addEventListener('touchend', handleTouchEnd, false);
 
 
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 20px;">
-    <h2>Max Alerts</h2>
-    <div id="alertsContainer"></div>
+    <h1 style="margin-top: -25px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
+    <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Vehicle safety alerts and recalls</p>
+    <div id="alertsContainer" style="text-align: left;"></div>
 </div>
 
 <script>
