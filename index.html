@@ -133,7 +133,7 @@
         }
     </style>
 </head>
-<body ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
+<body>
     <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
     <img src="SavingsTechpng.png" alt="App Logo" class="logo">
     <div class="menu" onclick="toggleMenu()">
@@ -155,7 +155,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 3:38pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -394,7 +394,7 @@ function closeCardForm() {
 
 //reg                   if (!document.getElementById("sentinelScreen").style.display.includes("block")) {
                           if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
-                              promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn’t.";
+                              promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn't.";
                               document.getElementById("promoSubMessage").textContent = "";
                               promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
                               // promoBtn.href = "https://www.mayboneeclark.com/insurance-quotes";
@@ -617,7 +617,7 @@ function shareApp() {
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
     <p style="color: green; font-weight: bold; font-size: 11px;">No Recalls or safety alerts found</p>
-    <p style="margin: 10px 0; font-size: 16px;">Register for eligible card benefits and manufacturer’s warranty?</p>
+    <p style="margin: 10px 0; font-size: 16px;">Register for eligible card benefits and manufacturer's warranty?</p>
     <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">Yes</button>
     <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">No</button>
     <div style="margin-top: 20px;">
@@ -646,6 +646,48 @@ function showSentinelScreen() {
   document.getElementById("nearestPlace").style.display = "none";
   document.getElementById("rewardCards").style.display = "none";
   document.getElementById("insurancePromo").style.display = "none";
+  document.getElementById("maxAlertsScreen").style.display = "none";
+}
+
+function showMaxAlertsScreen() {
+  document.getElementById("dotTopCard").textContent = "○";
+  document.getElementById("dotTopCard").style.color = "#ccc";
+  document.getElementById("dotSentinel").textContent = "○";
+  document.getElementById("dotSentinel").style.color = "#ccc";
+  document.getElementById("dotMaxAlerts").textContent = "●";
+  document.getElementById("dotMaxAlerts").style.color = "#0070C0";
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+  document.getElementById("maxAlertsScreen").style.display = "block";
+  document.getElementById("sentinelScreen").style.display = "none";
+  document.getElementById("phoneEntry").style.display = "none";
+  document.getElementById("getPlaceButton").style.display = "none";
+  document.getElementById("nearestPlaceHeading").style.display = "none";
+  document.getElementById("output").style.display = "none";
+  document.getElementById("nearestPlace").style.display = "none";
+  document.getElementById("rewardCards").style.display = "none";
+  document.getElementById("insurancePromo").style.display = "none";
+  loadVehicleRecalls();
+}
+
+function showMaxRewardsScreen() {
+  document.getElementById("dotTopCard").textContent = "●";
+  document.getElementById("dotTopCard").style.color = "#0070C0";
+  document.getElementById("dotSentinel").textContent = "○";
+  document.getElementById("dotSentinel").style.color = "#ccc";
+  document.getElementById("dotMaxAlerts").textContent = "○";
+  document.getElementById("dotMaxAlerts").style.color = "#ccc";
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+  document.getElementById("maxAlertsScreen").style.display = "none";
+  document.getElementById("sentinelScreen").style.display = "none";
+  document.getElementById("phoneEntry").style.display = "none";
+  document.getElementById("getPlaceButton").style.display = "block";
+  document.getElementById("nearestPlaceHeading").style.display = "block";
+  document.getElementById("output").style.display = "block";
+  document.getElementById("nearestPlace").style.display = "block";
+  document.getElementById("rewardCards").style.display = "block";
+  document.getElementById("insurancePromo").style.display = "block";
 }
 
 function handleBenefitsResponse(response) {
@@ -794,11 +836,9 @@ function handleWarrantyNo() {
     document.getElementById('barcodeFollowup').style.display = 'none';
 }
 
-
-document.addEventListener('touchstart', handleTouchStart, false);
-document.addEventListener('touchend', handleTouchEnd, false);
-
+// FIXED: Single unified touch handler to manage all three screens
 let xStart = null;
+
 function handleTouchStart(evt) {
   xStart = evt.touches[0].clientX;
 }
@@ -808,32 +848,33 @@ function handleTouchEnd(evt) {
   let xEnd = evt.changedTouches[0].clientX;
   let xDiff = xStart - xEnd;
 
-  const sentinelScreen = document.getElementById("sentinelScreen");
-  const isSentinelVisible = sentinelScreen.style.display === "block";
+  const isMaxRewardsVisible = document.getElementById("nearestPlaceHeading").style.display === "block";
+  const isSentinelVisible = document.getElementById("sentinelScreen").style.display === "block";
+  const isMaxAlertsVisible = document.getElementById("maxAlertsScreen").style.display === "block";
 
-  if (xDiff > 50 && !isSentinelVisible) {
-    const categoryId = parseInt(document.getElementById("nearestPlace")?.dataset?.categoryid || 0);
-    showSentinelScreen();
-//  comment out so doesn't check for type of merchant, makes it easier to test
-//    if ((categoryId >= 17000 && categoryId <= 17056) || (categoryId >= 17081 && categoryId <= 17146)) {
-//      showSentinelScreen();
-//    }
-  } else if (xDiff < -50 && isSentinelVisible) {
-    // Swipe right to return from Sentinel screen
-    sentinelScreen.style.display = "none";
-    document.getElementById("dotTopCard").textContent = "●";
-    document.getElementById("dotTopCard").style.color = "#0070C0";
-    document.getElementById("dotSentinel").textContent = "○";
-    document.getElementById("dotSentinel").style.color = "#ccc";
-    document.getElementById("nearestPlaceHeading").style.display = "block";
-    document.getElementById("getPlaceButton").style.display = "block";
-    document.getElementById("output").style.display = "block";
-    document.getElementById("nearestPlace").style.display = "block";
-    document.getElementById("rewardCards").style.display = "block";
-    document.getElementById("insurancePromo").style.display = "block";
+  if (xDiff > 50) { // Swipe left
+    if (isMaxRewardsVisible) {
+      // From Max Rewards to Max Benefits
+      showSentinelScreen();
+    } else if (isSentinelVisible) {
+      // From Max Benefits to Max Alerts
+      showMaxAlertsScreen();
+    }
+  } else if (xDiff < -50) { // Swipe right
+    if (isMaxAlertsVisible) {
+      // From Max Alerts to Max Benefits
+      showSentinelScreen();
+    } else if (isSentinelVisible) {
+      // From Max Benefits to Max Rewards
+      showMaxRewardsScreen();
+    }
   }
   xStart = null;
 }
+
+// FIXED: Add proper event listeners
+document.addEventListener('touchstart', handleTouchStart, false);
+document.addEventListener('touchend', handleTouchEnd, false);
 
 </script>
 
@@ -844,24 +885,7 @@ function handleTouchEnd(evt) {
 </div>
 
 <script>
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    function handleTouchStart(event) {
-        touchStartX = event.changedTouches[0].screenX;
-    }
-
-    function handleTouchEnd(event) {
-        touchEndX = event.changedTouches[0].screenX;
-        if (touchStartX - touchEndX > 50) {
-            // swipe left
-            if (document.getElementById("sentinelScreen")?.style.display === "block") {
-                document.getElementById("sentinelScreen").style.display = "none";
-                navigateTo('maxAlerts');
-                loadVehicleRecalls();
-            }
-        }
-    }
+    // REMOVED: Duplicate touch handling code that was causing conflicts
 
     function navigateTo(screen) {
         document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
@@ -937,6 +961,7 @@ function handleTouchEnd(evt) {
 <div id="screenIndicator" style="position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); display: none; z-index: 999;">
   <span id="dotTopCard" style="font-size: 24px; color: #0070C0;">●</span>
   <span id="dotSentinel" style="font-size: 24px; color: #ccc;">○</span>
+  <span id="dotMaxAlerts" style="font-size: 24px; color: #ccc;">○</span>
 </div>
 </body>
 </html>
