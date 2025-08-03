@@ -155,7 +155,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 3:38pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 3:56pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -431,6 +431,9 @@ function closeCardForm() {
             });
         }
 function shareApp() {
+  // Close the dropdown menu
+  document.getElementById("menuDropdown").style.display = "none";
+  
   const shareText = "Maximize card rewards effortlessly with this mobile app. Sponsored by Karen Tessman, State Farm agent, to help you spend smart and save!";
   const shareUrl = window.location.href;
 
@@ -550,17 +553,25 @@ function shareApp() {
             document.getElementById("menuDropdown").style.display = "none";
 
             // Show/hide screens
-            document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
-
-            // Add more screens here when you want to expand
-            document.getElementById("sentinelScreen").style.display = "none";
-            document.getElementById("phoneEntry").style.display = "none";
-            document.getElementById("getPlaceButton").style.display = "none";
-            document.getElementById("nearestPlaceHeading").style.display = "none";
-            document.getElementById("output").style.display = "none";
-            document.getElementById("nearestPlace").style.display = "none";
-            document.getElementById("rewardCards").style.display = "none";
-            document.getElementById("insurancePromo").style.display = "none";
+            if (screen === 'profileSetup') {
+                document.getElementById("profileSetupScreen").style.display = "block";
+                // Hide all other main screens when showing profile setup
+                document.getElementById("sentinelScreen").style.display = "none";
+                document.getElementById("maxAlertsScreen").style.display = "none";
+                document.getElementById("phoneEntry").style.display = "none";
+                document.getElementById("getPlaceButton").style.display = "none";
+                document.getElementById("nearestPlaceHeading").style.display = "none";
+                document.getElementById("output").style.display = "none";
+                document.getElementById("nearestPlace").style.display = "none";
+                document.getElementById("rewardCards").style.display = "none";
+                document.getElementById("insurancePromo").style.display = "none";
+                document.getElementById("screenIndicator").style.display = "none";
+                // Scroll to top when showing profile setup
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            } else {
+                document.getElementById("profileSetupScreen").style.display = "none";
+            }
         }
 
 
