@@ -64,15 +64,8 @@
         }
         .profile-setup {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 60px 20px 20px 20px;
+            text-align: center;
+            padding: 20px;
         }
         .form-section {
             margin-bottom: 15px;
@@ -101,15 +94,16 @@
             border: 1px solid #ccc;
             padding: 20px;
             border-radius: 10px;
-            margin-top: 20px;
-            width: 85%;
+            margin-top: -25px;
+            width: 90%;
             margin-left: auto;
             margin-right: auto;
             background-color: #f9f9f9;
         }
         #profileSetupScreen h2 {
-            margin-top: 0;
-            font-size: 16px;
+            margin-top: -25px;
+            font-size: 20px;
+            margin-bottom: 0px;
         }
         #output {
             margin-top: 20px;
@@ -181,6 +175,7 @@
             font-size: 11px;
             padding: 4px 8px;
             margin: 5px auto;
+            display: none;
         }
     </style>
 </head>
@@ -206,7 +201,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0858pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0909pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -517,7 +512,6 @@ function addVehicle() {
             <input type="text" placeholder="Make">
             <input type="text" placeholder="Model">
         </div>
-        <button type="button" class="remove-vehicle-btn" onclick="removeVehicle(${vehicleCount})">Remove Vehicle</button>
     `;
     
     vehicleContainer.appendChild(newVehicleSection);
@@ -529,41 +523,13 @@ function addVehicle() {
 }
 
 function removeVehicle(vehicleId) {
-    const vehicleElement = document.getElementById(`vehicle-${vehicleId}`);
-    if (vehicleElement) {
-        vehicleElement.remove();
-        vehicleCount--;
-        
-        // Renumber remaining vehicles
-        const remainingVehicles = document.querySelectorAll('.vehicle-section');
-        remainingVehicles.forEach((vehicle, index) => {
-            const newId = index + 1;
-            vehicle.id = `vehicle-${newId}`;
-            vehicle.querySelector('h4').textContent = `Vehicle ${newId}`;
-            vehicle.querySelector('.remove-vehicle-btn').setAttribute('onclick', `removeVehicle(${newId})`);
-        });
-        
-        vehicleCount = remainingVehicles.length;
-        
-        // Show add button if under limit
-        if (vehicleCount < 3) {
-            document.getElementById("addVehicleBtn").style.display = "block";
-        }
-    }
+    // Function kept for compatibility but buttons are hidden
 }
     </script>
 
     <div id="profileSetupScreen" class="profile-setup">
-        <img src="SavingsTechpng.png" alt="App Logo" class="logo">
-        <div class="menu" onclick="toggleMenu()">
-            <div></div>
-            <div></div>
-            <div></div>
-            <span>Menu</span>
-        </div>
-        <div class="mobile-box">
-            <h2>Your Profile for Safety Alerts</h2>
-            <p>Get notified of safety alerts and recalls</p>
+        <h2>Your Profile for Safety Alerts</h2>
+        <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Get notified of safety alerts and recalls</p>
 
             <div class="form-section">
                 <label for="stateSelect">Select Your State:</label><br>
@@ -649,7 +615,6 @@ function removeVehicle(vehicleId) {
                             <input type="text" placeholder="Make">
                             <input type="text" placeholder="Model">
                         </div>
-                        <button type="button" class="remove-vehicle-btn" onclick="removeVehicle(1)">Remove Vehicle</button>
                     </div>
                 </div>
                 <button type="button" id="addVehicleBtn" class="add-vehicle-btn" onclick="addVehicle()">+ Add Another Vehicle</button>
@@ -657,7 +622,6 @@ function removeVehicle(vehicleId) {
             </div>
 
             <button onclick="submitProfile()">Submit</button>
-        </div>
     </div>
 
     <script>
