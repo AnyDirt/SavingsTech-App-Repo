@@ -88,6 +88,14 @@
             margin-left: 10%;
             margin-right: 10%;
         }
+        .checkbox-columns {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .checkbox-column {
+            flex: 1;
+        }
         .mobile-box {
             border: 1px solid #ccc;
             padding: 20px;
@@ -162,7 +170,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0521pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0822pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -454,6 +462,7 @@ function shareApp() {
     </script>
 
     <div id="profileSetupScreen" class="profile-setup">
+        <img src="SavingsTechpng.png" alt="App Logo" class="logo">
         <div class="mobile-box">
             <h2>Your Profile for Safety Alerts</h2>
             <p>Set your profile for notifications of safety alerts and product recalls</p>
@@ -519,10 +528,18 @@ function shareApp() {
 
             <div class="form-section checkbox-group">
                 <label>Select all that apply:</label><br>
-                <input type="checkbox" id="student" name="profileType" value="Student"> Student<br>
-                <input type="checkbox" id="parent" name="profileType" value="Parent"> Parent<br>
-                <input type="checkbox" id="renter" name="profileType" value="Renter"> Renter<br>
-                <input type="checkbox" id="homeowner" name="profileType" value="Homeowner"> Homeowner<br>
+                <div class="checkbox-columns">
+                    <div class="checkbox-column">
+                        <input type="checkbox" id="student" name="profileType" value="Student"> Student<br>
+                        <input type="checkbox" id="parent" name="profileType" value="Parent"> Parent<br>
+                        <input type="checkbox" id="renter" name="profileType" value="Renter"> Renter<br>
+                    </div>
+                    <div class="checkbox-column">
+                        <input type="checkbox" id="petowner" name="profileType" value="Pet Owner"> Pet Owner<br>
+                        <input type="checkbox" id="retired" name="profileType" value="Retired"> Retired<br>
+                        <input type="checkbox" id="homeowner" name="profileType" value="Homeowner"> Homeowner<br>
+                    </div>
+                </div>
             </div>
 
             <div class="form-section">
@@ -569,8 +586,7 @@ function shareApp() {
                 document.getElementById("insurancePromo").style.display = "none";
                 document.getElementById("screenIndicator").style.display = "none";
                 
-                // Hide logo and menu during profile setup
-                document.querySelector(".logo").style.display = "none";
+                // Hide menu during profile setup (logo stays visible)
                 document.querySelector(".menu").style.display = "none";
                 
                 // Scroll to top
@@ -579,8 +595,7 @@ function shareApp() {
             } else {
                 document.getElementById("profileSetupScreen").style.display = "none";
                 
-                // Show logo and menu again
-                document.querySelector(".logo").style.display = "block";
+                // Show menu again (logo stays visible)
                 document.querySelector(".menu").style.display = "block";
             }
         }
@@ -616,8 +631,7 @@ function shareApp() {
             // Hide profile setup screen
             document.getElementById("profileSetupScreen").style.display = "none";
             
-            // Show logo and menu again
-            document.querySelector(".logo").style.display = "block";
+            // Show menu again (logo stays visible)
             document.querySelector(".menu").style.display = "block";
             
             // Show phone entry screen (login screen)
@@ -921,7 +935,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
 
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 20px;">
     <h1 style="margin-top: -25px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
-    <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Vehicle safety alerts and recalls</p>
+    <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Product safety alerts and recalls</p>
     <div id="alertsContainer" style="text-align: left;"></div>
 </div>
 
@@ -950,7 +964,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
         container.innerHTML = "";
 
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
-            container.innerHTML = "<p>There are no vehicles in your profile. Use the &lt; Set Up Profile for Safety Alerts &gt; to provide vehicle information to monitor for recalls and safety alerts.</p>";
+            container.innerHTML = "<p>There are no vehicles in your profile. Set up vehicle information in your profile to monitor for recalls and safety alerts.</p>";
             return;
         }
 
