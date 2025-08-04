@@ -170,7 +170,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1025pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0808am</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -934,7 +934,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
 
 
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 0px;">
-    <h1 style="margin-top: -10px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
+    <h1 style="margin-top: 0px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
     <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Product safety alerts and recalls</p>
     <div id="alertsContainer" style="text-align: left;"></div>
 </div>
@@ -964,7 +964,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
         container.innerHTML = "";
 
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
-            container.innerHTML = "<p>There are no vehicles in your profile. Set them up in your profile to receive safety alerts and recalls.</p>";
+            container.innerHTML = "<p>There are no vehicles setup in your profile.</p>";
             return;
         }
 
@@ -985,7 +985,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
                     const section = document.createElement("div");
                     section.className = "recall-detail";
                     section.innerHTML = `<div class='recall-heading'>${year} ${make} ${model}</div>
-                        <div>${recalls.length} recalls</div>`;
+                        <div><strong>${recalls.length} recalls</strong></div>`;
 
                     recalls.forEach(r => {
                         section.innerHTML += `
