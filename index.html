@@ -144,7 +144,7 @@
         #maxAlertsScreen {
             display: none;
             text-align: left;
-            padding: 10px;
+            padding: 0px;
         }
     </style>
 </head>
@@ -170,7 +170,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1017pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1025pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -933,8 +933,8 @@ document.addEventListener('touchend', handleTouchEnd, false);
 </script>
 
 
-<div id="maxAlertsScreen" style="display: none; text-align: center; padding: 10px;">
-    <h1 style="margin-top: -15px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
+<div id="maxAlertsScreen" style="display: none; text-align: center; padding: 0px;">
+    <h1 style="margin-top: -10px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
     <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Product safety alerts and recalls</p>
     <div id="alertsContainer" style="text-align: left;"></div>
 </div>
