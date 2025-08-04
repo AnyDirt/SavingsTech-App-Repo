@@ -84,7 +84,7 @@
             margin: 5px auto;
         }
         .checkbox-group {
-            text-align: left;
+            text-align: center;
             margin-left: 10%;
             margin-right: 10%;
         }
@@ -92,6 +92,7 @@
             display: flex;
             justify-content: space-between;
             gap: 20px;
+            text-align: left;
         }
         .checkbox-column {
             flex: 1;
@@ -101,7 +102,7 @@
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
-            width: 90%;
+            width: 85%;
             margin-left: auto;
             margin-right: auto;
             background-color: #f9f9f9;
@@ -146,6 +147,41 @@
             text-align: left;
             padding: 20px;
         }
+        .vehicle-section {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+        }
+        .vehicle-section h4 {
+            margin: 0 0 10px 0;
+            color: #0070C0;
+            font-size: 14px;
+        }
+        .vehicle-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .vehicle-row input {
+            flex: 1;
+            width: auto;
+            font-size: 14px;
+            padding: 6px;
+        }
+        .add-vehicle-btn {
+            background-color: #28a745;
+            font-size: 12px;
+            padding: 6px 12px;
+            margin: 5px auto;
+        }
+        .remove-vehicle-btn {
+            background-color: #dc3545;
+            font-size: 11px;
+            padding: 4px 8px;
+            margin: 5px auto;
+        }
     </style>
 </head>
 <body>
@@ -170,7 +206,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0822pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0858pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -183,6 +219,8 @@
     </div>
 
     <script>
+        let vehicleCount = 1;
+
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem("userPhoneNumber")) {
                 document.getElementById("phoneEntry").style.display = "none";
@@ -459,13 +497,73 @@ function shareApp() {
     window.location.href = `sms:?&body=${encodeURIComponent(shareText + " " + shareUrl)}`;
   }
 }
+
+function addVehicle() {
+    if (vehicleCount >= 3) {
+        alert("Maximum of 3 vehicles allowed.");
+        return;
+    }
+    
+    vehicleCount++;
+    const vehicleContainer = document.getElementById("vehicleInputs");
+    const newVehicleSection = document.createElement("div");
+    newVehicleSection.className = "vehicle-section";
+    newVehicleSection.id = `vehicle-${vehicleCount}`;
+    
+    newVehicleSection.innerHTML = `
+        <h4>Vehicle ${vehicleCount}</h4>
+        <div class="vehicle-row">
+            <input type="text" placeholder="Year" maxlength="4">
+            <input type="text" placeholder="Make">
+            <input type="text" placeholder="Model">
+        </div>
+        <button type="button" class="remove-vehicle-btn" onclick="removeVehicle(${vehicleCount})">Remove Vehicle</button>
+    `;
+    
+    vehicleContainer.appendChild(newVehicleSection);
+    
+    // Hide add button if we've reached the limit
+    if (vehicleCount >= 3) {
+        document.getElementById("addVehicleBtn").style.display = "none";
+    }
+}
+
+function removeVehicle(vehicleId) {
+    const vehicleElement = document.getElementById(`vehicle-${vehicleId}`);
+    if (vehicleElement) {
+        vehicleElement.remove();
+        vehicleCount--;
+        
+        // Renumber remaining vehicles
+        const remainingVehicles = document.querySelectorAll('.vehicle-section');
+        remainingVehicles.forEach((vehicle, index) => {
+            const newId = index + 1;
+            vehicle.id = `vehicle-${newId}`;
+            vehicle.querySelector('h4').textContent = `Vehicle ${newId}`;
+            vehicle.querySelector('.remove-vehicle-btn').setAttribute('onclick', `removeVehicle(${newId})`);
+        });
+        
+        vehicleCount = remainingVehicles.length;
+        
+        // Show add button if under limit
+        if (vehicleCount < 3) {
+            document.getElementById("addVehicleBtn").style.display = "block";
+        }
+    }
+}
     </script>
 
     <div id="profileSetupScreen" class="profile-setup">
         <img src="SavingsTechpng.png" alt="App Logo" class="logo">
+        <div class="menu" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+            <span>Menu</span>
+        </div>
         <div class="mobile-box">
             <h2>Your Profile for Safety Alerts</h2>
-            <p>Receive notifications of safety alerts and recalls</p>
+            <p>Get notified of safety alerts and recalls</p>
 
             <div class="form-section">
                 <label for="stateSelect">Select Your State:</label><br>
@@ -522,12 +620,11 @@ function shareApp() {
                     <option value="WV">West Virginia</option>
                     <option value="WI">Wisconsin</option>
                     <option value="WY">Wyoming</option>
-                    <!-- Add remaining states -->
                 </select>
             </div>
 
             <div class="form-section checkbox-group">
-                <label>Select all that apply:</label><br>
+                <label style="text-align: center; display: block; margin-bottom: 10px;">Select all that apply:</label>
                 <div class="checkbox-columns">
                     <div class="checkbox-column">
                         <input type="checkbox" id="student" name="profileType" value="Student"> Student<br>
@@ -543,20 +640,20 @@ function shareApp() {
             </div>
 
             <div class="form-section">
-                <label>Vehicle Information (up to 3):</label><br>
+                <label style="display: block; margin-bottom: 10px;">Vehicle Information:</label>
                 <div id="vehicleInputs">
-                    <input type="text" placeholder="Model Year">
-                    <input type="text" placeholder="Make">
-                    <input type="text" placeholder="Model"><br>
-
-                    <input type="text" placeholder="Model Year">
-                    <input type="text" placeholder="Make">
-                    <input type="text" placeholder="Model"><br>
-
-                    <input type="text" placeholder="Model Year">
-                    <input type="text" placeholder="Make">
-                    <input type="text" placeholder="Model">
+                    <div class="vehicle-section" id="vehicle-1">
+                        <h4>Vehicle 1</h4>
+                        <div class="vehicle-row">
+                            <input type="text" placeholder="Year" maxlength="4">
+                            <input type="text" placeholder="Make">
+                            <input type="text" placeholder="Model">
+                        </div>
+                        <button type="button" class="remove-vehicle-btn" onclick="removeVehicle(1)">Remove Vehicle</button>
+                    </div>
                 </div>
+                <button type="button" id="addVehicleBtn" class="add-vehicle-btn" onclick="addVehicle()">+ Add Another Vehicle</button>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">Add up to 3 vehicles for safety alerts and recalls</p>
             </div>
 
             <button onclick="submitProfile()">Submit</button>
@@ -586,8 +683,9 @@ function shareApp() {
                 document.getElementById("insurancePromo").style.display = "none";
                 document.getElementById("screenIndicator").style.display = "none";
                 
-                // Hide menu during profile setup (logo stays visible)
-                document.querySelector(".menu").style.display = "none";
+                // Keep both logo and menu visible during profile setup
+                document.querySelector(".logo").style.display = "block";
+                document.querySelector(".menu").style.display = "block";
                 
                 // Scroll to top
                 document.body.scrollTop = 0;
@@ -595,7 +693,7 @@ function shareApp() {
             } else {
                 document.getElementById("profileSetupScreen").style.display = "none";
                 
-                // Show menu again (logo stays visible)
+                // Keep menu visible
                 document.querySelector(".menu").style.display = "block";
             }
         }
@@ -606,16 +704,17 @@ function shareApp() {
             const checkboxes = document.querySelectorAll('input[name="profileType"]:checked');
             const profileTypes = Array.from(checkboxes).map(cb => cb.value);
 
-            const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
+            const vehicleSections = document.querySelectorAll('.vehicle-section');
             const vehicles = [];
-            for (let i = 0; i < vehicleInputs.length; i += 3) {
-                const year = vehicleInputs[i].value;
-                const make = vehicleInputs[i + 1].value;
-                const model = vehicleInputs[i + 2].value;
+            vehicleSections.forEach(section => {
+                const inputs = section.querySelectorAll('input');
+                const year = inputs[0].value;
+                const make = inputs[1].value;
+                const model = inputs[2].value;
                 if (year || make || model) {
                     vehicles.push({ year, make, model });
                 }
-            }
+            });
 
             const profileData = {
                 state,
@@ -800,9 +899,6 @@ function startScanner() {
         width: { ideal: 1280 },
         height: { ideal: 720 }
       }
-      // constraints: {
-        // facingMode: "environment"
-      // }
     },
 
     decoder: {
@@ -820,10 +916,6 @@ function startScanner() {
     },
     numOfWorkers: navigator.hardwareConcurrency || 4,
     frequency: 5
-
-    // decoder: {
-      // readers: ["upc_reader"]
-    // }
   }, function(err) {
     if (err) {
       console.error(err);
@@ -846,13 +938,6 @@ function onBarcodeDetected(result) {
   const code = result.codeResult.code;
   if (/^\d{12}$/.test(code)) {
     document.getElementById("beepSound").play();
-    // const beepAudio = document.getElementById("beepSound");
-    // const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // const source = audioCtx.createMediaElementSource(beepAudio);
-    // const gainNode = audioCtx.createGain();
-    // gainNode.gain.value = 2.5; // increase volume (1.0 is default)
-    // source.connect(gainNode).connect(audioCtx.destination);
-    // beepAudio.play();
     stopScanner();
     document.getElementById('barcodeInput').value = code;
     lookupBarcode(code);
@@ -940,8 +1025,6 @@ document.addEventListener('touchend', handleTouchEnd, false);
 </div>
 
 <script>
-    // REMOVED: Duplicate touch handling code that was causing conflicts
-
     function navigateTo(screen) {
         document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
         document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
