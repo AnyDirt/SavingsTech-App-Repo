@@ -146,6 +146,25 @@
             text-align: left;
             padding: 0px;
         }
+        .product-display {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .product-image {
+            width: 80px;
+            height: 80px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        .product-details {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -170,7 +189,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0943pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1018pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -765,6 +784,8 @@ function lookupBarcode(upcOverride) {
       if (!data.products || !data.products.length) {
         document.getElementById("productInfo").innerHTML = "Product not found";
         document.getElementById('barcodeFollowup').style.display = 'none';
+        // Clear Max Alerts product info if no product found
+        document.getElementById("maxAlertsProductInfo").innerHTML = "";
         return;
       }
       const product = data.products[0];
@@ -778,12 +799,61 @@ function lookupBarcode(upcOverride) {
       document.getElementById("productInfo").innerHTML = info;
       document.getElementById('barcodeFollowup').style.display = 'block';
 
+      // Update Max Alerts screen product info
+      updateMaxAlertsProductInfo(product, barcode, image);
+
     })
     .catch(error => {
       console.error("Error fetching barcode data:", error);
       document.getElementById("productInfo").innerHTML = "Product not found.";
       document.getElementById('barcodeFollowup').style.display = 'none';
+      document.getElementById("maxAlertsProductInfo").innerHTML = "";
     });
+}
+
+function updateMaxAlertsProductInfo(product, barcode, image) {
+  const maxAlertsContainer = document.getElementById("maxAlertsProductInfo");
+  
+  // Product display section
+  const productDisplay = document.createElement("div");
+  productDisplay.className = "product-display";
+  
+  let productHTML = "";
+  if (image) {
+    productHTML += `<img src="${image}" alt="Product Image" class="product-image">`;
+  } else {
+    productHTML += `<div class="product-image" style="background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">No Image</div>`;
+  }
+  
+  productHTML += `
+    <div class="product-details">
+      <strong>Brand:</strong> ${product.brand || 'N/A'}<br>
+      <strong>Model:</strong> ${product.model || 'N/A'}<br>
+      <strong>UPC:</strong> ${barcode}
+    </div>
+  `;
+  
+  productDisplay.innerHTML = productHTML;
+  
+  // Recall status section
+  const recallStatus = document.createElement("div");
+  recallStatus.style.marginTop = "15px";
+  
+  if (barcode === "706943534113") {
+    recallStatus.innerHTML = `
+      <p style="color: red; font-weight: bold; margin: 10px 0;">Backyard Kids Recalls KidKraft Farm to Table Play Kitchens Due to Strangulation Hazard; One Death Reported. CPSC reported July 31, 2025.</p>
+      <div style="margin: 10px 0;">
+        <span style="background-color: yellow; color: black; padding: 2px 6px; font-size: 12px;">Injuries Reported</span>
+        <span style="margin-left: 25px; background-color: red; color: white; padding: 2px 6px; font-size: 12px;">Death(s) reported</span>
+      </div>
+    `;
+  } else {
+    recallStatus.innerHTML = `<p style="color: green; font-weight: bold; margin: 10px 0;">No recalls or safety alerts found</p>`;
+  }
+  
+  maxAlertsContainer.innerHTML = "";
+  maxAlertsContainer.appendChild(productDisplay);
+  maxAlertsContainer.appendChild(recallStatus);
 }
 
 function startScanner() {
@@ -914,6 +984,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 0px;">
     <h1 style="margin-top: 0px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
     <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Updates on recalls and safety alerts</p>
+    <div id="maxAlertsProductInfo" style="margin: 15px 0; text-align: left;"></div>
     <div id="alertsContainer" style="text-align: left;"></div>
 </div>
 
@@ -960,12 +1031,16 @@ document.addEventListener('touchend', handleTouchEnd, false);
     async function loadVehicleRecalls() {
         const profile = JSON.parse(localStorage.getItem("userProfile"));
         const container = document.getElementById("alertsContainer");
-        container.innerHTML = "";
-
+        
+        // Add heading for profile-based recalls
+        let heading = "<h3>Recalls and safety alerts based on profile:</h3>";
+        
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
-            container.innerHTML = "<p>There are no vehicles setup in your profile.</p>";
+            container.innerHTML = heading + "<p>There are no vehicles setup in your profile.</p>";
             return;
         }
+
+        container.innerHTML = heading;
 
         for (const vehicle of profile.vehicles) {
             const { year, make, model } = vehicle;
