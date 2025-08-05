@@ -170,7 +170,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0817pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 0943pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -979,6 +979,11 @@ document.addEventListener('touchend', handleTouchEnd, false);
                     if (!reportDate) return false;
                     const now = new Date();
                     return reportDate > new Date(now.getFullYear() - 4, now.getMonth(), now.getDate());
+                }).sort((a, b) => {
+                    // Sort by date, most recent first
+                    const dateA = parseDateFromDDMMYYYY(a.ReportReceivedDate);
+                    const dateB = parseDateFromDDMMYYYY(b.ReportReceivedDate);
+                    return dateB - dateA;
                 }).slice(0, 3);
 
                 if (recalls.length > 0) {
@@ -992,9 +997,9 @@ document.addEventListener('touchend', handleTouchEnd, false);
                         section.innerHTML += `
                             <div>${formattedDate}</div>
                             <div>
-                                <input type='checkbox' ${r.ParkIt ? 'checked' : ''} disabled> Do Not Drive?
-                                <span>Must park outside: ${r.ParkOutside ? 'Yes' : 'No'}</span>
-                                <span>Over-the-Air Update: ${r.OTAUpdate ? 'Yes' : 'No'}</span>
+                                <strong>Do Not Drive:</strong> ${r.ParkIt ? 'Yes' : 'No'}<br>
+                                <strong>Must park outside:</strong> ${r.ParkOutside ? 'Yes' : 'No'}<br>
+                                <strong>Over-the-Air Update:</strong> ${r.OTAUpdate ? 'Yes' : 'No'}
                             </div>
                             <div><strong>Summary:</strong> ${r.Summary}</div>
                             <div><strong>Remedy:</strong> ${r.Remedy}</div>
