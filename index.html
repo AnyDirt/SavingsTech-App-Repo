@@ -189,7 +189,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1018pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1040pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -837,7 +837,7 @@ function updateMaxAlertsProductInfo(product, barcode, image) {
   
   // Recall status section
   const recallStatus = document.createElement("div");
-  recallStatus.style.marginTop = "15px";
+  recallStatus.style.marginTop = "5px";
   
   if (barcode === "706943534113") {
     recallStatus.innerHTML = `
@@ -1033,7 +1033,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
         const container = document.getElementById("alertsContainer");
         
         // Add heading for profile-based recalls
-        let heading = "<h3>Recalls and safety alerts based on profile:</h3>";
+        let heading = "<h3>Updates based on your profile:</h3>";
         
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
             container.innerHTML = heading + "<p>There are no vehicles setup in your profile.</p>";
