@@ -189,7 +189,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1040pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1055pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -841,14 +841,14 @@ function updateMaxAlertsProductInfo(product, barcode, image) {
   
   if (barcode === "706943534113") {
     recallStatus.innerHTML = `
-      <p style="color: red; font-weight: bold; margin: 10px 0;">Backyard Kids Recalls KidKraft Farm to Table Play Kitchens Due to Strangulation Hazard; One Death Reported. CPSC reported July 31, 2025.</p>
+      <p style="color: red; font-size: 14px; font-weight: bold; margin: 10px 0;">Backyard Kids Recalls KidKraft Farm to Table Play Kitchens Due to Strangulation Hazard; One Death Reported. CPSC reported July 31, 2025.</p>
       <div style="margin: 10px 0;">
         <span style="background-color: yellow; color: black; padding: 2px 6px; font-size: 12px;">Injuries Reported</span>
         <span style="margin-left: 25px; background-color: red; color: white; padding: 2px 6px; font-size: 12px;">Death(s) reported</span>
       </div>
     `;
   } else {
-    recallStatus.innerHTML = `<p style="color: green; font-weight: bold; margin: 10px 0;">No recalls or safety alerts found</p>`;
+    recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 10px 0;">No recalls or safety alerts found</p>`;
   }
   
   maxAlertsContainer.innerHTML = "";
