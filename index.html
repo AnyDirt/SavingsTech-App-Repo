@@ -764,7 +764,7 @@ function lookupBarcode(upcOverride) {
       console.log("API response:", data);
       if (!data.products || !data.products.length) {
         document.getElementById("productInfo").innerHTML = "Product not found";
-        document.getElementById('barcodeFollowup').style.display = 'none'; // hide follow-up if not found
+        document.getElementById('barcodeFollowup').style.display = 'none';
         return;
       }
       const product = data.products[0];
@@ -782,8 +782,7 @@ function lookupBarcode(upcOverride) {
     .catch(error => {
       console.error("Error fetching barcode data:", error);
       document.getElementById("productInfo").innerHTML = "Product not found.";
-      document.getElementById('barcodeFollowup').style.display = 'none'; // hide follow-up if not found
-
+      document.getElementById('barcodeFollowup').style.display = 'none';
     });
 }
 
@@ -800,11 +799,7 @@ function startScanner() {
         width: { ideal: 1280 },
         height: { ideal: 720 }
       }
-      // constraints: {
-        // facingMode: "environment"
-      // }
     },
-
     decoder: {
       readers: ["upc_reader"],
       debug: {
@@ -815,15 +810,11 @@ function startScanner() {
       }
     },
     locator: {
-      patchSize: "medium", // x-small | small | medium | large | x-large
+      patchSize: "medium",
       halfSample: true
     },
     numOfWorkers: navigator.hardwareConcurrency || 4,
     frequency: 5
-
-    // decoder: {
-      // readers: ["upc_reader"]
-    // }
   }, function(err) {
     if (err) {
       console.error(err);
@@ -846,13 +837,6 @@ function onBarcodeDetected(result) {
   const code = result.codeResult.code;
   if (/^\d{12}$/.test(code)) {
     document.getElementById("beepSound").play();
-    // const beepAudio = document.getElementById("beepSound");
-    // const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // const source = audioCtx.createMediaElementSource(beepAudio);
-    // const gainNode = audioCtx.createGain();
-    // gainNode.gain.value = 2.5; // increase volume (1.0 is default)
-    // source.connect(gainNode).connect(audioCtx.destination);
-    // beepAudio.play();
     stopScanner();
     document.getElementById('barcodeInput').value = code;
     lookupBarcode(code);
@@ -871,7 +855,7 @@ async function checkRecall(barcode) {
             resultDiv.innerText = data[0].Title;
             resultDiv.style.color = "red";
         } else {
-            resultDiv.innerText = "";  // was "No recalls or safety alerts found"
+            resultDiv.innerText = "";
             resultDiv.style.color = "green";
         }
     } catch (error) {
@@ -880,7 +864,6 @@ async function checkRecall(barcode) {
         resultDiv.style.color = "orange";
     }
 }
-
 
 function handleWarrantyYes() {
     alert("You selected Yes. Further logic to be implemented.");
@@ -906,27 +889,22 @@ function handleTouchEnd(evt) {
   const isSentinelVisible = document.getElementById("sentinelScreen").style.display === "block";
   const isMaxAlertsVisible = document.getElementById("maxAlertsScreen").style.display === "block";
 
-  if (xDiff > 50) { // Swipe left
+  if (xDiff > 50) {
     if (isMaxRewardsVisible) {
-      // From Max Rewards to Max Benefits
       showSentinelScreen();
     } else if (isSentinelVisible) {
-      // From Max Benefits to Max Alerts
       showMaxAlertsScreen();
     }
-  } else if (xDiff < -50) { // Swipe right
+  } else if (xDiff < -50) {
     if (isMaxAlertsVisible) {
-      // From Max Alerts to Max Benefits
       showSentinelScreen();
     } else if (isSentinelVisible) {
-      // From Max Benefits to Max Rewards
       showMaxRewardsScreen();
     }
   }
   xStart = null;
 }
 
-// FIXED: Add proper event listeners
 document.addEventListener('touchstart', handleTouchStart, false);
 document.addEventListener('touchend', handleTouchEnd, false);
 
@@ -940,8 +918,6 @@ document.addEventListener('touchend', handleTouchEnd, false);
 </div>
 
 <script>
-    // REMOVED: Duplicate touch handling code that was causing conflicts
-
     function navigateTo(screen) {
         document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
         document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
@@ -956,6 +932,29 @@ document.addEventListener('touchend', handleTouchEnd, false);
             document.getElementById("insurancePromo").style.display = "none";
             document.getElementById('barcodeFollowup').style.display = 'none';
         }
+    }
+
+    // Helper function to parse DD/MM/YYYY format and convert to MM/DD/YYYY display format
+    function parseDateFromDDMMYYYY(dateStr) {
+        if (!dateStr) return null;
+        const parts = dateStr.split('/');
+        if (parts.length !== 3) return null;
+        const day = parts[0];
+        const month = parts[1];
+        const year = parts[2];
+        // Return date object using MM/DD/YYYY format for proper parsing
+        return new Date(month + '/' + day + '/' + year);
+    }
+
+    function formatDateToMMDDYYYY(dateStr) {
+        if (!dateStr) return dateStr;
+        const parts = dateStr.split('/');
+        if (parts.length !== 3) return dateStr;
+        const day = parts[0];
+        const month = parts[1];
+        const year = parts[2];
+        // Convert DD/MM/YYYY to MM/DD/YYYY for display
+        return month + '/' + day + '/' + year;
     }
 
     async function loadVehicleRecalls() {
@@ -976,7 +975,8 @@ document.addEventListener('touchend', handleTouchEnd, false);
                 const data = await response.json();
 
                 const recalls = (data.results || []).filter(r => {
-                const reportDate = new Date(r.ReportReceivedDate);
+                    const reportDate = parseDateFromDDMMYYYY(r.ReportReceivedDate);
+                    if (!reportDate) return false;
                     const now = new Date();
                     return reportDate > new Date(now.getFullYear() - 4, now.getMonth(), now.getDate());
                 }).slice(0, 3);
@@ -988,8 +988,9 @@ document.addEventListener('touchend', handleTouchEnd, false);
                         <div><strong>${recalls.length} recalls</strong></div>`;
 
                     recalls.forEach(r => {
+                        const formattedDate = formatDateToMMDDYYYY(r.ReportReceivedDate);
                         section.innerHTML += `
-                            <div>${r.ReportReceivedDate}</div>
+                            <div>${formattedDate}</div>
                             <div>
                                 <input type='checkbox' ${r.ParkIt ? 'checked' : ''} disabled> Do Not Drive?
                                 <span>Must park outside: ${r.ParkOutside ? 'Yes' : 'No'}</span>
