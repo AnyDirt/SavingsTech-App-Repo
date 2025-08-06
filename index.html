@@ -190,7 +190,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1052pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1128pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -451,7 +451,9 @@ function closeCardForm() {
                           }
       
                           promoMsg.style.display = "block";
-                          promoButton.style.display = "inline-block";
+                          promoBtn.style.display = "inline-block";
+                          document.getElementById("insurancePromo").style.display = "block";
+
 //reg                   }                  
 
                     } else {
@@ -485,7 +487,7 @@ function shareApp() {
         <img src="SavingsTechpng.png" alt="App Logo" class="logo">
         <div class="mobile-box">
             <h2>Your Profile for Safety Alerts</h2>
-            <p>Get notified of recalls and safety alerts on what matters most</p>
+            <p>Get notifications on what matters most</p>
 
             <div class="form-section">
                 <label for="stateSelect">Select Your State:</label><br>
