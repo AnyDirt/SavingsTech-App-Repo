@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="/SavingsTech Icon png.png">
     <title>SavingsTech</title>
+    
+<script>
+  let password = prompt("Password:");
+  if (password !== "1Greene1") {
+    document.body.innerHTML = "<h2>App disabled</h2>";
+  }
+</script>
+
+
     <script src="https://unpkg.com/@ericblade/quagga2@v0.0.10/dist/quagga.min.js"></script>  
     <style>
         body {
@@ -169,10 +178,6 @@
     </style>
 </head>
 <body>
-
-</body>
-</html>
-
     <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
     <img src="SavingsTechpng.png" alt="App Logo" class="logo">
     <div class="menu" onclick="toggleMenu()">
@@ -194,7 +199,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 214am</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 236am</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
