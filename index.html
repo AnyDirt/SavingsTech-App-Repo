@@ -582,6 +582,8 @@ function shareApp() {
             </div>
 
             <button onclick="submitProfile()">Submit</button>
+            <button onclick="cancelProfile()" style="background-color: #ccc; color: #333; margin-top: 5px;">Cancel</button>
+
         </div>
     </div>
 
@@ -595,6 +597,8 @@ function shareApp() {
             if (screen === 'profileSetup') {
                 // Show profile setup screen
                 document.getElementById("profileSetupScreen").style.display = "block";
+                // Load saved profile data to populate the form
+                loadSavedProfile();
                 
                 // Hide ALL other screens and elements completely
                 document.getElementById("sentinelScreen").style.display = "none";
@@ -674,6 +678,77 @@ function shareApp() {
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
         }
+
+        function cancelProfile() {
+            // Hide profile setup screen
+            document.getElementById("profileSetupScreen").style.display = "none";
+    
+            // Show menu again
+            document.querySelector(".menu").style.display = "block";
+    
+            // Hide menu dropdown if open
+            document.getElementById("menuDropdown").style.display = "none";
+    
+            // Return to appropriate screen based on login state
+            if (localStorage.getItem("userPhoneNumber")) {
+                // User is logged in - show main rewards screen
+                document.getElementById("getPlaceButton").style.display = "block";
+                document.getElementById("nearestPlaceHeading").style.display = "block";
+                document.getElementById("output").style.display = "block";
+                document.getElementById("nearestPlace").style.display = "block";
+                document.getElementById("rewardCards").style.display = "block";
+                document.getElementById("insurancePromo").style.display = "block";
+                document.getElementById("screenIndicator").style.display = "block";
+            } else {
+                // User not logged in - show phone entry screen
+                document.getElementById("phoneEntry").style.display = "block";
+            }
+    
+            // Ensure other screens are hidden
+            document.getElementById("sentinelScreen").style.display = "none";
+            document.getElementById("maxAlertsScreen").style.display = "none";
+    
+            // Scroll to top
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+        function loadSavedProfile() {
+            const savedProfile = localStorage.getItem("userProfile");
+            if (!savedProfile) return;
+    
+            const profile = JSON.parse(savedProfile);
+    
+            // Populate state dropdown
+            if (profile.state) {
+                document.getElementById("stateSelect").value = profile.state;
+            }
+    
+            // Populate checkboxes
+            if (profile.profileTypes) {
+                // First clear all checkboxes
+                document.querySelectorAll('input[name="profileType"]').forEach(cb => cb.checked = false);
+                // Then check the saved ones
+                profile.profileTypes.forEach(type => {
+                    const checkbox = document.querySelector(`input[name="profileType"][value="${type}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+    
+            // Populate vehicle information
+            if (profile.vehicles) {
+                const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
+                profile.vehicles.forEach((vehicle, index) => {
+                    const baseIndex = index * 3;
+                    if (baseIndex < vehicleInputs.length) {
+                        vehicleInputs[baseIndex].value = vehicle.year || '';
+                        vehicleInputs[baseIndex + 1].value = vehicle.make || '';
+                        vehicleInputs[baseIndex + 2].value = vehicle.model || '';
+                    }
+                });
+            }
+        }
+
     </script>
 
 
