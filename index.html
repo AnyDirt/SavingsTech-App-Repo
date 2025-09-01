@@ -1062,6 +1062,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 0px;">
     <h1 style="margin-top: 0px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
     <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Updates on recalls and safety alerts</p>
+    <p style="font-size: 18px; text-align: left; font-style: italic; color: #555; margin-top: 0;">Updates on recent purchases</p>
     <div id="maxAlertsProductInfo" style="margin: 15px 0; text-align: left;"></div>
     <div id="alertsContainer" style="text-align: left;"></div>
 </div>
@@ -1114,7 +1115,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
         let heading = "<h3>Updates based on your profile:</h3>";
         
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
-            container.innerHTML = heading + "<p>There are no vehicles setup in your profile.</p>";
+            container.innerHTML = heading + "<p>There are no vehicles set up in your profile.</p>";
             return;
         }
 
