@@ -598,8 +598,8 @@ function shareApp() {
             if (screen === 'profileSetup') {
                 // Show profile setup screen
                 document.getElementById("profileSetupScreen").style.display = "block";
-                // Load saved profile data to populate the form
-                loadSavedProfile();
+                // Load saved profile data with a small delay to ensure DOM is ready
+                setTimeout(loadSavedProfile, 50);
                 
                 // Hide ALL other screens and elements completely
                 document.getElementById("sentinelScreen").style.display = "none";
@@ -716,35 +716,50 @@ function shareApp() {
 
         function loadSavedProfile() {
             const savedProfile = localStorage.getItem("userProfile");
-            if (!savedProfile) return;
+            if (!savedProfile) {
+                console.log("No saved profile found");
+                return;
+            }
     
             const profile = JSON.parse(savedProfile);
+            console.log("Loading saved profile:", profile);
     
             // Populate state dropdown
             if (profile.state) {
-                document.getElementById("stateSelect").value = profile.state;
+                const stateSelect = document.getElementById("stateSelect");
+                if (stateSelect) {
+                    stateSelect.value = profile.state;
+                    console.log("Set state to:", profile.state);
+                }
             }
     
             // Populate checkboxes
-            if (profile.profileTypes) {
+            if (profile.profileTypes && profile.profileTypes.length > 0) {
                 // First clear all checkboxes
                 document.querySelectorAll('input[name="profileType"]').forEach(cb => cb.checked = false);
                 // Then check the saved ones
                 profile.profileTypes.forEach(type => {
                     const checkbox = document.querySelector(`input[name="profileType"][value="${type}"]`);
-                    if (checkbox) checkbox.checked = true;
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        console.log("Checked:", type);
+                    }
                 });
             }
     
             // Populate vehicle information
-            if (profile.vehicles) {
+            if (profile.vehicles && profile.vehicles.length > 0) {
                 const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
+                // Clear all vehicle inputs first
+                vehicleInputs.forEach(input => input.value = '');
+                // Then populate with saved data
                 profile.vehicles.forEach((vehicle, index) => {
                     const baseIndex = index * 3;
                     if (baseIndex < vehicleInputs.length) {
-                        vehicleInputs[baseIndex].value = vehicle.year || '';
-                        vehicleInputs[baseIndex + 1].value = vehicle.make || '';
-                        vehicleInputs[baseIndex + 2].value = vehicle.model || '';
+                        if (vehicle.year) vehicleInputs[baseIndex].value = vehicle.year;
+                        if (vehicle.make) vehicleInputs[baseIndex + 1].value = vehicle.make;
+                        if (vehicle.model) vehicleInputs[baseIndex + 2].value = vehicle.model;
+                        console.log(`Set vehicle ${index + 1}:`, vehicle);
                     }
                 });
             }
