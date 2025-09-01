@@ -468,7 +468,7 @@ function closeCardForm() {
             });
         }
 function shareApp() {
-  const shareText = "This app automatically finds your best card for rewards at any store you visit and keeps you updated on product recalls. Provided by local State Farm agent Karen Tessman to help our community save money and stay safe.";
+  const shareText = "This app finds your best reward card anywhere and alerts you to product recalls. From State Farm agent Karen Tessman to help our community save money and stay safe.";
 
   const shareUrl = window.location.href;
 
@@ -1026,15 +1026,37 @@ function handleWarrantyNo() {
 
 // FIXED: Single unified touch handler to manage all three screens
 let xStart = null;
+let yStart = null;
 
 function handleTouchStart(evt) {
+  // Don't handle touch events when profile setup is visible
+  if (document.getElementById("profileSetupScreen").style.display === "block") {
+    return;
+  }
+  
   xStart = evt.touches[0].clientX;
+  yStart = evt.touches[0].clientY;
 }
 
 function handleTouchEnd(evt) {
-  if (!xStart) return;
+  // Don't handle touch events when profile setup is visible
+  if (document.getElementById("profileSetupScreen").style.display === "block") {
+    return;
+  }
+  
+  if (!xStart || !yStart) return;
+  
   let xEnd = evt.changedTouches[0].clientX;
+  let yEnd = evt.changedTouches[0].clientY;
   let xDiff = xStart - xEnd;
+  let yDiff = yStart - yEnd;
+  
+  // Only handle horizontal swipes (ignore if vertical swipe is larger)
+  if (Math.abs(yDiff) > Math.abs(xDiff)) {
+    xStart = null;
+    yStart = null;
+    return;
+  }
 
   const isMaxRewardsVisible = document.getElementById("nearestPlaceHeading").style.display === "block";
   const isSentinelVisible = document.getElementById("sentinelScreen").style.display === "block";
@@ -1053,7 +1075,9 @@ function handleTouchEnd(evt) {
       showMaxRewardsScreen();
     }
   }
+  
   xStart = null;
+  yStart = null;
 }
 
 document.addEventListener('touchstart', handleTouchStart, false);
