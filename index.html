@@ -1064,7 +1064,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
     <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Updates on recalls and safety alerts</p>
     <p style="font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0; margin-bottom: 0px;">Updates on recent purchases</p>
     <div id="maxAlertsProductInfo" style="margin: 15px 0; text-align: left; margin-bottom: 0px;"></div>
-    <div id="alertsContainer" style="text-align: left;"></div>
+    <div id="alertsContainer" style="text-align: left; margin-top: 0; margin-bottom: 0px;"></div>
 </div>
 
 <script>
@@ -1112,7 +1112,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
         const container = document.getElementById("alertsContainer");
         
         // Add heading for profile-based recalls
-        let heading = "<p style='font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0; margin-bottom: 0px;'>Updates based on profile:</p>";
+        let heading = "<p style='font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0;'>Updates based on profile</p>";
           
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
             container.innerHTML = heading + "<p>There are no vehicles set up in your profile.</p>";
