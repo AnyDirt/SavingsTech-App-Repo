@@ -915,20 +915,21 @@ function updateMaxAlertsProductInfo(product, barcode, image) {
   
   // Recall status section
   const recallStatus = document.createElement("div");
-  recallStatus.style.marginTop = "0px";
+  recallStatus.style.marginTop = "5px";
   
   if (barcode === "706943534113") {
     recallStatus.innerHTML = `
-      <p style="color: red; font-size: 14px; font-weight: bold; margin: 10px 0;">Backyard Kids Recalls KidKraft Farm to Table Play Kitchens Due to Strangulation Hazard; One Death Reported. CPSC reported July 31, 2025.</p>
+      <p style="color: red; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">Backyard Kids Recalls KidKraft Farm to Table Play Kitchens Due to Strangulation Hazard; One Death Reported. CPSC reported July 31, 2025.</p>
       <div style="margin: 10px 0;">
         <span style="background-color: yellow; color: black; padding: 2px 6px; font-size: 12px;">Injuries Reported</span>
         <span style="margin-left: 25px; background-color: red; color: white; padding: 2px 6px; font-size: 12px;">Death(s) reported</span>
       </div>
     `;
   } else {
-    recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 10px 0;">No recalls or safety alerts found</p>`;
+    recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">No recalls or safety alerts found</p>`;
   }
-  
+
+
   maxAlertsContainer.innerHTML = "";
   maxAlertsContainer.appendChild(productDisplay);
   maxAlertsContainer.appendChild(recallStatus);
