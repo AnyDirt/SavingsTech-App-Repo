@@ -915,7 +915,7 @@ function updateMaxAlertsProductInfo(product, barcode, image) {
   
   // Recall status section
   const recallStatus = document.createElement("div");
-  recallStatus.style.marginTop = "5px";
+  recallStatus.style.marginTop = "0px";
   
   if (barcode === "706943534113") {
     recallStatus.innerHTML = `
@@ -926,7 +926,7 @@ function updateMaxAlertsProductInfo(product, barcode, image) {
       </div>
     `;
   } else {
-    recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">No recalls or safety alerts found</p>`;
+    recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">No recalls or safety alerts found.</p>`;
   }
 
 
