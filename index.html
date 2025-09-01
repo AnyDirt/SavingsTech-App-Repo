@@ -768,7 +768,7 @@ function shareApp() {
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
     <!-- <p style="color: green; font-weight: bold; font-size: 11px;">No Recalls or safety alerts found</p> -->
-    <p style="margin: 10px 0; font-size: 16px;">File for purchase protection and manufacturer's warranty?</p>
+    <p style="margin: 10px 0; font-size: 16px;">File for card purchase protection and manufacturer's warranty?</p>
     <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">Yes</button>
     <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">No</button>
     <div style="margin-top: 20px;">
@@ -1114,7 +1114,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
         const container = document.getElementById("alertsContainer");
         
         // Add heading for profile-based recalls
-        let heading = "<p style='font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0; margin-bottom: 5px;'>Updates based on profile:</p>";
+        let heading = "<p style='font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0; margin-bottom: 5px;'>Updates based on profile</p>";
           
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
             container.innerHTML = heading + "<p>There are no vehicles set up in your profile.</p>";
@@ -1145,8 +1145,9 @@ document.addEventListener('touchend', handleTouchEnd, false);
                 if (recalls.length > 0) {
                     const section = document.createElement("div");
                     section.className = "recall-detail";
-                    section.innerHTML = `<div class='recall-heading'>${year} ${make} ${model}</div>
+                    section.innerHTML = `<div class='recall-heading'><strong>${year} ${make} ${model}</strong></div>
                         <div><strong>${recalls.length} recalls</strong></div>`;
+
 
                     recalls.forEach(r => {
                         const formattedDate = formatDateToMMDDYYYY(r.ReportReceivedDate);
