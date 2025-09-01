@@ -1112,7 +1112,7 @@ document.addEventListener('touchend', handleTouchEnd, false);
         const container = document.getElementById("alertsContainer");
         
         // Add heading for profile-based recalls
-        let heading = "<h3>Updates based on profile:</h3>";
+        let heading = "<p style='font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0; margin-bottom: 0px;'>Updates based on profile:</p>";
           
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
             container.innerHTML = heading + "<p>There are no vehicles set up in your profile.</p>";
