@@ -468,7 +468,7 @@ function closeCardForm() {
             });
         }
 function shareApp() {
-  const shareText = "This app finds your best reward card anywhere and alerts you to product recalls. From State Farm agent Karen Tessman to help our community save money and stay safe.";
+  const shareText = "This app finds your best card for rewards anywhere and it alerts you to product recalls. From State Farm agent Karen Tessman to help our community save and stay safe.";
 
   const shareUrl = window.location.href;
 
@@ -568,17 +568,32 @@ function shareApp() {
             <div class="form-section">
                 <label>Vehicle Information (up to 3):</label><br>
                 <div id="vehicleInputs">
-                    <input type="text" placeholder="Model Year">
-                    <input type="text" placeholder="Make">
-                    <input type="text" placeholder="Model"><br>
+                    <!-- Vehicle 1 -->
+                    <select class="vehicle-year" data-vehicle="0">
+                        <option value="">Year</option>
+                    </select>
+                    <select class="vehicle-make" data-vehicle="0">
+                        <option value="">Make</option>
+                    </select>
+                    <input type="text" class="vehicle-model" data-vehicle="0" placeholder="Model"><br>
 
-                    <input type="text" placeholder="Model Year">
-                    <input type="text" placeholder="Make">
-                    <input type="text" placeholder="Model"><br>
+                    <!-- Vehicle 2 -->
+                    <select class="vehicle-year" data-vehicle="1">
+                        <option value="">Year</option>
+                    </select>
+                    <select class="vehicle-make" data-vehicle="1">
+                        <option value="">Make</option>
+                    </select>
+                    <input type="text" class="vehicle-model" data-vehicle="1" placeholder="Model"><br>
 
-                    <input type="text" placeholder="Model Year">
-                    <input type="text" placeholder="Make">
-                    <input type="text" placeholder="Model">
+                    <!-- Vehicle 3 -->
+                    <select class="vehicle-year" data-vehicle="2">
+                        <option value="">Year</option>
+                    </select>
+                    <select class="vehicle-make" data-vehicle="2">
+                        <option value="">Make</option>
+                    </select>
+                    <input type="text" class="vehicle-model" data-vehicle="2" placeholder="Model">
                 </div>
             </div>
 
@@ -598,6 +613,7 @@ function shareApp() {
             if (screen === 'profileSetup') {
                 // Show profile setup screen
                 document.getElementById("profileSetupScreen").style.display = "block";
+                initializeVehicleDropdowns(); // Added this line to load drop-down lists
                 // Load saved profile data with a small delay to ensure DOM is ready
                 setTimeout(loadSavedProfile, 50);
                 
@@ -627,6 +643,40 @@ function shareApp() {
             }
         }
 
+        function initializeVehicleDropdowns() {
+            // Populate year dropdowns (current year back to 1980)
+            const currentYear = new Date().getFullYear();
+            const yearSelects = document.querySelectorAll('.vehicle-year');
+    
+            yearSelects.forEach(select => {
+                for (let year = currentYear; year >= 1980; year--) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    select.appendChild(option);
+                }
+            });
+
+            // Populate make dropdowns
+            const makes = [
+                'Acura', 'Alfa Romeo', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 
+                'Chrysler', 'Dodge', 'FIAT', 'Ford', 'Genesis', 'GMC', 'Honda', 'Hyundai', 
+                'INFINITI', 'Jaguar', 'Jeep', 'Kia', 'Land Rover', 'Lexus', 'Lincoln', 
+                'Maserati', 'Mazda', 'Mercedes-Benz', 'MINI', 'Mitsubishi', 'Nissan', 
+                'Porsche', 'Ram', 'Subaru', 'Tesla', 'Toyota', 'Volkswagen', 'Volvo'
+            ];
+
+            const makeSelects = document.querySelectorAll('.vehicle-make');
+            makeSelects.forEach(select => {
+                makes.forEach(make => {
+                    const option = document.createElement('option');
+                    option.value = make;
+                    option.textContent = make;
+                    select.appendChild(option);
+                });
+            });
+        }
+
         function submitProfile() {
             const state = document.getElementById("stateSelect").value;
 
@@ -635,10 +685,11 @@ function shareApp() {
 
             const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
             const vehicles = [];
-            for (let i = 0; i < vehicleInputs.length; i += 3) {
-                const year = vehicleInputs[i].value;
-                const make = vehicleInputs[i + 1].value;
-                const model = vehicleInputs[i + 2].value;
+            for (let i = 0; i < 3; i++) {
+                const year = document.querySelector(`.vehicle-year[data-vehicle="${i}"]`)?.value;
+                const make = document.querySelector(`.vehicle-make[data-vehicle="${i}"]`)?.value;  
+                const model = document.querySelector(`.vehicle-model[data-vehicle="${i}"]`)?.value;
+    
                 if (year || make || model) {
                     vehicles.push({ year, make, model });
                 }
@@ -749,20 +800,19 @@ function shareApp() {
     
             // Populate vehicle information
             if (profile.vehicles && profile.vehicles.length > 0) {
-                const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
-                // Clear all vehicle inputs first
-                vehicleInputs.forEach(input => input.value = '');
-                // Then populate with saved data
                 profile.vehicles.forEach((vehicle, index) => {
-                    const baseIndex = index * 3;
-                    if (baseIndex < vehicleInputs.length) {
-                        if (vehicle.year) vehicleInputs[baseIndex].value = vehicle.year;
-                        if (vehicle.make) vehicleInputs[baseIndex + 1].value = vehicle.make;
-                        if (vehicle.model) vehicleInputs[baseIndex + 2].value = vehicle.model;
-                        console.log(`Set vehicle ${index + 1}:`, vehicle);
+                    if (index < 3) { // Only handle up to 3 vehicles
+                        const yearSelect = document.querySelector(`.vehicle-year[data-vehicle="${index}"]`);
+                        const makeSelect = document.querySelector(`.vehicle-make[data-vehicle="${index}"]`);
+                        const modelInput = document.querySelector(`.vehicle-model[data-vehicle="${index}"]`);
+            
+                        if (yearSelect && vehicle.year) yearSelect.value = vehicle.year;
+                        if (makeSelect && vehicle.make) makeSelect.value = vehicle.make;
+                        if (modelInput && vehicle.model) modelInput.value = vehicle.model;
                     }
                 });
             }
+
         }
 
     </script>
