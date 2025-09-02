@@ -74,7 +74,6 @@
             z-index: 1000;
             overflow-y: auto;
             padding: 30px 10px 10px 10px;
-            overflow-x: visible;
         }
         .form-section {
             margin-bottom: 15px;
@@ -107,19 +106,10 @@
             margin-left: auto;
             margin-right: auto;
             background-color: #f9f9f9;
-            overflow: visible;
-            position: relative;
         }
         #profileSetupScreen h2 {
             margin-top: 0;
             font-size: 16px;
-        }
-       .vehicle-year, .vehicle-make, .vehicle-model {
-            width: 80%;
-            padding: 8px;
-            font-size: 16px;
-            margin: 5px auto;
-            display: block;
         }
         #output {
             margin-top: 20px;
@@ -200,7 +190,7 @@
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1101am</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your Top Card for rewards and offers 1128pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -213,7 +203,6 @@
     </div>
 
     <script>
-
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem("userPhoneNumber")) {
                 document.getElementById("phoneEntry").style.display = "none";
@@ -221,38 +210,7 @@
                 document.getElementById("nearestPlaceHeading").style.display = "block";
                 document.getElementById("output").style.display = "block";
             }
-    
-            // Initialize vehicle dropdowns immediately when page loads
-            initializeVehicleDropdownsOnLoad();
         });
-
-        function initializeVehicleDropdownsOnLoad() {
-            // Populate year dropdowns
-            const currentYear = new Date().getFullYear();
-            const yearSelects = document.querySelectorAll('.vehicle-year');
-    
-            yearSelects.forEach(select => {
-                for (let year = currentYear; year >= 1980; year--) {
-                    const option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    select.appendChild(option);
-                }
-            });
-
-            // Populate make dropdowns
-            const makes = ['Acura', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 'Chrysler', 'Dodge', 'Ford', 'GMC', 'Honda', 'Hyundai', 'Jeep', 'Kia', 'Lexus', 'Mazda', 'Mercedes-Benz', 'Nissan', 'Subaru', 'Tesla', 'Toyota', 'Volkswagen'];
-    
-            const makeSelects = document.querySelectorAll('.vehicle-make');
-            makeSelects.forEach(select => {
-                makes.forEach(make => {
-                    const option = document.createElement('option');
-                    option.value = make;
-                    option.textContent = make;
-                    select.appendChild(option);
-                });
-            });
-        }
 
         function savePhoneNumber() {
             let phoneNumber = document.getElementById("phoneNumber").value;
@@ -510,8 +468,7 @@ function closeCardForm() {
             });
         }
 function shareApp() {
-  const shareText = "This app finds your best card for rewards anywhere and it alerts you to product recalls. From State Farm agent Karen Tessman to help our community save and stay safe.";
-
+  const shareText = "Maximize card rewards and benefits effortlessly with your everyday finance. Sponsored by Karen Tessman, State Farm agent, to help you spend smart and save!";
   const shareUrl = window.location.href;
 
   if (navigator.share) {
@@ -610,32 +567,17 @@ function shareApp() {
             <div class="form-section">
                 <label>Vehicle Information (up to 3):</label><br>
                 <div id="vehicleInputs">
-                    <!-- Vehicle 1 -->
-                    <select class="vehicle-year" data-vehicle="0">
-                        <option value="">Year</option>
-                    </select>
-                    <select class="vehicle-make" data-vehicle="0">
-                        <option value="">Make</option>
-                    </select>
-                    <input type="text" class="vehicle-model" data-vehicle="0" placeholder="Model"><br>
+                    <input type="text" placeholder="Model Year">
+                    <input type="text" placeholder="Make">
+                    <input type="text" placeholder="Model"><br>
 
-                    <!-- Vehicle 2 -->
-                    <select class="vehicle-year" data-vehicle="1">
-                        <option value="">Year</option>
-                    </select>
-                    <select class="vehicle-make" data-vehicle="1">
-                        <option value="">Make</option>
-                    </select>
-                    <input type="text" class="vehicle-model" data-vehicle="1" placeholder="Model"><br>
+                    <input type="text" placeholder="Model Year">
+                    <input type="text" placeholder="Make">
+                    <input type="text" placeholder="Model"><br>
 
-                    <!-- Vehicle 3 -->
-                    <select class="vehicle-year" data-vehicle="2">
-                        <option value="">Year</option>
-                    </select>
-                    <select class="vehicle-make" data-vehicle="2">
-                        <option value="">Make</option>
-                    </select>
-                    <input type="text" class="vehicle-model" data-vehicle="2" placeholder="Model">
+                    <input type="text" placeholder="Model Year">
+                    <input type="text" placeholder="Make">
+                    <input type="text" placeholder="Model">
                 </div>
             </div>
 
@@ -655,10 +597,9 @@ function shareApp() {
             if (screen === 'profileSetup') {
                 // Show profile setup screen
                 document.getElementById("profileSetupScreen").style.display = "block";
-        
-                // Load saved profile data
-                setTimeout(loadSavedProfile, 100);
-        
+                // Load saved profile data to populate the form
+                loadSavedProfile();
+                
                 // Hide ALL other screens and elements completely
                 document.getElementById("sentinelScreen").style.display = "none";
                 document.getElementById("maxAlertsScreen").style.display = "none";
@@ -670,21 +611,20 @@ function shareApp() {
                 document.getElementById("rewardCards").style.display = "none";
                 document.getElementById("insurancePromo").style.display = "none";
                 document.getElementById("screenIndicator").style.display = "none";
-        
+                
                 // Hide menu during profile setup (logo stays visible)
                 document.querySelector(".menu").style.display = "none";
-        
+                
                 // Scroll to top
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
             } else {
                 document.getElementById("profileSetupScreen").style.display = "none";
-        
+                
                 // Show menu again (logo stays visible)
                 document.querySelector(".menu").style.display = "block";
             }
         }
-
 
         function submitProfile() {
             const state = document.getElementById("stateSelect").value;
@@ -694,11 +634,10 @@ function shareApp() {
 
             const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
             const vehicles = [];
-            for (let i = 0; i < 3; i++) {
-                const year = document.querySelector(`.vehicle-year[data-vehicle="${i}"]`)?.value;
-                const make = document.querySelector(`.vehicle-make[data-vehicle="${i}"]`)?.value;  
-                const model = document.querySelector(`.vehicle-model[data-vehicle="${i}"]`)?.value;
-    
+            for (let i = 0; i < vehicleInputs.length; i += 3) {
+                const year = vehicleInputs[i].value;
+                const make = vehicleInputs[i + 1].value;
+                const model = vehicleInputs[i + 2].value;
                 if (year || make || model) {
                     vehicles.push({ year, make, model });
                 }
@@ -776,52 +715,38 @@ function shareApp() {
 
         function loadSavedProfile() {
             const savedProfile = localStorage.getItem("userProfile");
-            if (!savedProfile) {
-                console.log("No saved profile found");
-                return;
-            }
+            if (!savedProfile) return;
     
             const profile = JSON.parse(savedProfile);
-            console.log("Loading saved profile:", profile);
     
             // Populate state dropdown
             if (profile.state) {
-                const stateSelect = document.getElementById("stateSelect");
-                if (stateSelect) {
-                    stateSelect.value = profile.state;
-                    console.log("Set state to:", profile.state);
-                }
+                document.getElementById("stateSelect").value = profile.state;
             }
     
             // Populate checkboxes
-            if (profile.profileTypes && profile.profileTypes.length > 0) {
+            if (profile.profileTypes) {
                 // First clear all checkboxes
                 document.querySelectorAll('input[name="profileType"]').forEach(cb => cb.checked = false);
                 // Then check the saved ones
                 profile.profileTypes.forEach(type => {
                     const checkbox = document.querySelector(`input[name="profileType"][value="${type}"]`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        console.log("Checked:", type);
-                    }
+                    if (checkbox) checkbox.checked = true;
                 });
             }
     
             // Populate vehicle information
-            if (profile.vehicles && profile.vehicles.length > 0) {
+            if (profile.vehicles) {
+                const vehicleInputs = document.querySelectorAll('#vehicleInputs input');
                 profile.vehicles.forEach((vehicle, index) => {
-                    if (index < 3) { // Only handle up to 3 vehicles
-                        const yearSelect = document.querySelector(`.vehicle-year[data-vehicle="${index}"]`);
-                        const makeSelect = document.querySelector(`.vehicle-make[data-vehicle="${index}"]`);
-                        const modelInput = document.querySelector(`.vehicle-model[data-vehicle="${index}"]`);
-            
-                        if (yearSelect && vehicle.year) yearSelect.value = vehicle.year;
-                        if (makeSelect && vehicle.make) makeSelect.value = vehicle.make;
-                        if (modelInput && vehicle.model) modelInput.value = vehicle.model;
+                    const baseIndex = index * 3;
+                    if (baseIndex < vehicleInputs.length) {
+                        vehicleInputs[baseIndex].value = vehicle.year || '';
+                        vehicleInputs[baseIndex + 1].value = vehicle.make || '';
+                        vehicleInputs[baseIndex + 2].value = vehicle.model || '';
                     }
                 });
             }
-
         }
 
     </script>
@@ -843,7 +768,7 @@ function shareApp() {
   <div id="productInfo" style="margin-top: 10px; font-size: 14px;"></div>
   <div id="barcodeFollowup" style="margin-top: -15px; font-size: 14px; display: none;">
     <!-- <p style="color: green; font-weight: bold; font-size: 11px;">No Recalls or safety alerts found</p> -->
-    <p style="margin: 10px 0; font-size: 16px;">File for card purchase protection and manufacturer's warranty?</p>
+    <p style="margin: 10px 0; font-size: 16px;">File for purchase protection and manufacturer's warranty?</p>
     <button onclick="handleWarrantyYes()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">Yes</button>
     <button onclick="handleWarrantyNo()" style="display: inline-block; margin: 5px 10px; padding: 6px 12px; font-size: 17px;">No</button>
     <div style="margin-top: 20px;">
@@ -987,25 +912,23 @@ function updateMaxAlertsProductInfo(product, barcode, image) {
   `;
   
   productDisplay.innerHTML = productHTML;
-  productDisplay.style.marginBottom = "0px";
   
   // Recall status section
   const recallStatus = document.createElement("div");
-  recallStatus.style.marginTop = "0px";
+  recallStatus.style.marginTop = "5px";
   
   if (barcode === "706943534113") {
     recallStatus.innerHTML = `
-      <p style="color: red; font-size: 14px; font-weight: bold; margin: 0 0 20px 0;">Backyard Kids Recalls KidKraft Farm to Table Play Kitchens Due to Strangulation Hazard; One Death Reported. CPSC reported July 31, 2025.</p>
+      <p style="color: red; font-size: 14px; font-weight: bold; margin: 10px 0;">Backyard Kids Recalls KidKraft Farm to Table Play Kitchens Due to Strangulation Hazard; One Death Reported. CPSC reported July 31, 2025.</p>
       <div style="margin: 10px 0;">
         <span style="background-color: yellow; color: black; padding: 2px 6px; font-size: 12px;">Injuries Reported</span>
         <span style="margin-left: 25px; background-color: red; color: white; padding: 2px 6px; font-size: 12px;">Death(s) reported</span>
       </div>
     `;
   } else {
-    recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 0 0 20px 0;">No recalls or safety alerts found.</p>`;
+    recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 10px 0;">No recalls or safety alerts found</p>`;
   }
-
-
+  
   maxAlertsContainer.innerHTML = "";
   maxAlertsContainer.appendChild(productDisplay);
   maxAlertsContainer.appendChild(recallStatus);
@@ -1100,37 +1023,15 @@ function handleWarrantyNo() {
 
 // FIXED: Single unified touch handler to manage all three screens
 let xStart = null;
-let yStart = null;
 
 function handleTouchStart(evt) {
-  // Don't handle touch events when profile setup is visible
-  if (document.getElementById("profileSetupScreen").style.display === "block") {
-    return;
-  }
-  
   xStart = evt.touches[0].clientX;
-  yStart = evt.touches[0].clientY;
 }
 
 function handleTouchEnd(evt) {
-  // Don't handle touch events when profile setup is visible
-  if (document.getElementById("profileSetupScreen").style.display === "block") {
-    return;
-  }
-  
-  if (!xStart || !yStart) return;
-  
+  if (!xStart) return;
   let xEnd = evt.changedTouches[0].clientX;
-  let yEnd = evt.changedTouches[0].clientY;
   let xDiff = xStart - xEnd;
-  let yDiff = yStart - yEnd;
-  
-  // Only handle horizontal swipes (ignore if vertical swipe is larger)
-  if (Math.abs(yDiff) > Math.abs(xDiff)) {
-    xStart = null;
-    yStart = null;
-    return;
-  }
 
   const isMaxRewardsVisible = document.getElementById("nearestPlaceHeading").style.display === "block";
   const isSentinelVisible = document.getElementById("sentinelScreen").style.display === "block";
@@ -1149,9 +1050,7 @@ function handleTouchEnd(evt) {
       showMaxRewardsScreen();
     }
   }
-  
   xStart = null;
-  yStart = null;
 }
 
 document.addEventListener('touchstart', handleTouchStart, false);
@@ -1163,9 +1062,8 @@ document.addEventListener('touchend', handleTouchEnd, false);
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 0px;">
     <h1 style="margin-top: 0px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
     <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Updates on recalls and safety alerts</p>
-    <p style="font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0; margin-bottom: 0px;">Updates on recent purchases</p>
-    <div id="maxAlertsProductInfo" style="margin: 15px 0; text-align: left; margin-top: 0; margin-bottom: 0px;"></div>
-    <div id="alertsContainer" style="text-align: left; margin-top: 0; margin-bottom: 0px;"></div>
+    <div id="maxAlertsProductInfo" style="margin: 15px 0; text-align: left;"></div>
+    <div id="alertsContainer" style="text-align: left;"></div>
 </div>
 
 <script>
@@ -1213,10 +1111,10 @@ document.addEventListener('touchend', handleTouchEnd, false);
         const container = document.getElementById("alertsContainer");
         
         // Add heading for profile-based recalls
-        let heading = "<p style='font-size: 17px; text-align: left; font-weight: bold; color: #0070C0; margin-top: 0; margin-bottom: 5px;'>Updates based on profile</p>";
-          
+        let heading = "<h3>Updates based on your profile:</h3>";
+        
         if (!profile || !profile.vehicles || profile.vehicles.length === 0) {
-            container.innerHTML = heading + "<p>There are no vehicles set up in your profile.</p>";
+            container.innerHTML = heading + "<p>There are no vehicles setup in your profile.</p>";
             return;
         }
 
@@ -1244,9 +1142,8 @@ document.addEventListener('touchend', handleTouchEnd, false);
                 if (recalls.length > 0) {
                     const section = document.createElement("div");
                     section.className = "recall-detail";
-                    section.innerHTML = `<div class='recall-heading'><strong>${year} ${make} ${model}</strong></div>
+                    section.innerHTML = `<div class='recall-heading'>${year} ${make} ${model}</div>
                         <div><strong>${recalls.length} recalls</strong></div>`;
-
 
                     recalls.forEach(r => {
                         const formattedDate = formatDateToMMDDYYYY(r.ReportReceivedDate);
