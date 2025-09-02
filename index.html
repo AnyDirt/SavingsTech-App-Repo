@@ -121,12 +121,6 @@
             margin: 5px auto;
             display: block;
         }
-        /* Ensure dropdown options are visible */
-        .vehicle-year option, .vehicle-make option {
-            background: white;
-            color: black;
-            padding: 5px;
-        }
         #output {
             margin-top: 20px;
             font-size: 18px;
@@ -219,20 +213,46 @@
     </div>
 
     <script>
+
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem("userPhoneNumber")) {
                 document.getElementById("phoneEntry").style.display = "none";
                 document.getElementById("getPlaceButton").style.display = "block";
                 document.getElementById("nearestPlaceHeading").style.display = "block";
                 document.getElementById("output").style.display = "block";
-            } else {
-                // Add this else block if missing
-                document.getElementById("phoneEntry").style.display = "block";
-                document.getElementById("getPlaceButton").style.display = "none";
-                document.getElementById("nearestPlaceHeading").style.display = "none";
-                document.getElementById("output").style.display = "none";
             }
+    
+            // Initialize vehicle dropdowns immediately when page loads
+            initializeVehicleDropdownsOnLoad();
         });
+
+        function initializeVehicleDropdownsOnLoad() {
+            // Populate year dropdowns
+            const currentYear = new Date().getFullYear();
+            const yearSelects = document.querySelectorAll('.vehicle-year');
+    
+            yearSelects.forEach(select => {
+                for (let year = currentYear; year >= 1980; year--) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    select.appendChild(option);
+                }
+            });
+
+            // Populate make dropdowns
+            const makes = ['Acura', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 'Chrysler', 'Dodge', 'Ford', 'GMC', 'Honda', 'Hyundai', 'Jeep', 'Kia', 'Lexus', 'Mazda', 'Mercedes-Benz', 'Nissan', 'Subaru', 'Tesla', 'Toyota', 'Volkswagen'];
+    
+            const makeSelects = document.querySelectorAll('.vehicle-make');
+            makeSelects.forEach(select => {
+                makes.forEach(make => {
+                    const option = document.createElement('option');
+                    option.value = make;
+                    option.textContent = make;
+                    select.appendChild(option);
+                });
+            });
+        }
 
         function savePhoneNumber() {
             let phoneNumber = document.getElementById("phoneNumber").value;
@@ -631,53 +651,14 @@ function shareApp() {
             dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
         }
 
-
-        function initializeVehicleDropdowns() {
-            // console.log("Initializing vehicle dropdowns...");
-    
-            // Populate year dropdowns
-            const currentYear = new Date().getFullYear();
-            const yearSelects = document.querySelectorAll('.vehicle-year');
-    
-            yearSelects.forEach(select => {
-                // Only populate if empty (avoid duplicates)
-                if (select.options.length <= 1) {
-                    for (let year = currentYear; year >= 1980; year--) {
-                        const option = document.createElement('option');
-                        option.value = year;
-                        option.textContent = year;
-                        select.appendChild(option);
-                    }
-                }
-            });
-
-            // Populate make dropdowns  
-            const makes = ['Acura', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 'Chrysler', 'Dodge', 'Ford', 'GMC', 'Honda', 'Hyundai', 'Jeep', 'Kia', 'Lexus', 'Mazda', 'Mercedes-Benz', 'Nissan', 'Subaru', 'Tesla', 'Toyota', 'Volkswagen'];
-    
-            const makeSelects = document.querySelectorAll('.vehicle-make');
-            makeSelects.forEach(select => {
-                // Only populate if empty (avoid duplicates)
-                if (select.options.length <= 1) {
-                    makes.forEach(make => {
-                        const option = document.createElement('option');
-                        option.value = make;
-                        option.textContent = make;
-                        select.appendChild(option);
-                    });
-                }
-            });
-    
-            // console.log("Dropdowns initialized");
-        }
-
         function navigateTo(screen) {
             if (screen === 'profileSetup') {
                 // Show profile setup screen
                 document.getElementById("profileSetupScreen").style.display = "block";
-                initializeVehicleDropdowns(); // Added this line to load drop-down lists
-                // Load saved profile data with a small delay to ensure DOM is ready
-                setTimeout(loadSavedProfile, 50);
-                
+        
+                // Load saved profile data
+                setTimeout(loadSavedProfile, 100);
+        
                 // Hide ALL other screens and elements completely
                 document.getElementById("sentinelScreen").style.display = "none";
                 document.getElementById("maxAlertsScreen").style.display = "none";
@@ -689,20 +670,21 @@ function shareApp() {
                 document.getElementById("rewardCards").style.display = "none";
                 document.getElementById("insurancePromo").style.display = "none";
                 document.getElementById("screenIndicator").style.display = "none";
-                
+        
                 // Hide menu during profile setup (logo stays visible)
                 document.querySelector(".menu").style.display = "none";
-                
+        
                 // Scroll to top
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
             } else {
                 document.getElementById("profileSetupScreen").style.display = "none";
-                
+        
                 // Show menu again (logo stays visible)
                 document.querySelector(".menu").style.display = "block";
             }
         }
+
 
         function submitProfile() {
             const state = document.getElementById("stateSelect").value;
