@@ -111,6 +111,16 @@
             margin-top: 0;
             font-size: 16px;
         }
+        .vehicle-year, .vehicle-make, .vehicle-model {
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+            margin: 5px auto;
+            display: block;
+            -webkit-appearance: menulist;
+            -moz-appearance: menulist;
+            appearance: menulist;
+        }
         #output {
             margin-top: 20px;
             font-size: 18px;
@@ -610,11 +620,17 @@ function shareApp() {
         }
 
         function initializeVehicleDropdowns() {
-            // Populate year dropdowns (current year back to 1980)
+            // Clear and populate year dropdowns (current year back to 1980)
             const currentYear = new Date().getFullYear();
             const yearSelects = document.querySelectorAll('.vehicle-year');
-    
+
             yearSelects.forEach(select => {
+                // Clear existing options except the first placeholder
+                while (select.options.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+        
+                // Add year options
                 for (let year = currentYear; year >= 1980; year--) {
                     const option = document.createElement('option');
                     option.value = year;
@@ -623,7 +639,7 @@ function shareApp() {
                 }
             });
 
-            // Populate make dropdowns
+            // Clear and populate make dropdowns
             const makes = [
                 'Acura', 'Alfa Romeo', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 
                 'Chrysler', 'Dodge', 'FIAT', 'Ford', 'Genesis', 'GMC', 'Honda', 'Hyundai', 
@@ -634,6 +650,12 @@ function shareApp() {
 
             const makeSelects = document.querySelectorAll('.vehicle-make');
             makeSelects.forEach(select => {
+                // Clear existing options except the first placeholder
+                while (select.options.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+        
+                // Add make options
                 makes.forEach(make => {
                     const option = document.createElement('option');
                     option.value = make;
@@ -641,6 +663,7 @@ function shareApp() {
                     select.appendChild(option);
                 });
             });
+            console.log("Vehicle dropdowns initialized");
         }
 
         function navigateTo(screen) {
