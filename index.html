@@ -609,40 +609,6 @@ function shareApp() {
             dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
         }
 
-        function navigateTo(screen) {
-            if (screen === 'profileSetup') {
-                // Show profile setup screen
-                document.getElementById("profileSetupScreen").style.display = "block";
-                initializeVehicleDropdowns(); // Added this line to load drop-down lists
-                // Load saved profile data with a small delay to ensure DOM is ready
-                setTimeout(loadSavedProfile, 50);
-                
-                // Hide ALL other screens and elements completely
-                document.getElementById("sentinelScreen").style.display = "none";
-                document.getElementById("maxAlertsScreen").style.display = "none";
-                document.getElementById("phoneEntry").style.display = "none";
-                document.getElementById("getPlaceButton").style.display = "none";
-                document.getElementById("nearestPlaceHeading").style.display = "none";
-                document.getElementById("output").style.display = "none";
-                document.getElementById("nearestPlace").style.display = "none";
-                document.getElementById("rewardCards").style.display = "none";
-                document.getElementById("insurancePromo").style.display = "none";
-                document.getElementById("screenIndicator").style.display = "none";
-                
-                // Hide menu during profile setup (logo stays visible)
-                document.querySelector(".menu").style.display = "none";
-                
-                // Scroll to top
-                document.body.scrollTop = 0;
-                document.documentElement.scrollTop = 0;
-            } else {
-                document.getElementById("profileSetupScreen").style.display = "none";
-                
-                // Show menu again (logo stays visible)
-                document.querySelector(".menu").style.display = "block";
-            }
-        }
-
         function initializeVehicleDropdowns() {
             // Populate year dropdowns (current year back to 1980)
             const currentYear = new Date().getFullYear();
@@ -675,6 +641,40 @@ function shareApp() {
                     select.appendChild(option);
                 });
             });
+        }
+
+        function navigateTo(screen) {
+            if (screen === 'profileSetup') {
+                // Show profile setup screen
+                document.getElementById("profileSetupScreen").style.display = "block";
+                initializeVehicleDropdowns(); // Added this line to load drop-down lists
+                // Load saved profile data with a small delay to ensure DOM is ready
+                setTimeout(loadSavedProfile, 50);
+                
+                // Hide ALL other screens and elements completely
+                document.getElementById("sentinelScreen").style.display = "none";
+                document.getElementById("maxAlertsScreen").style.display = "none";
+                document.getElementById("phoneEntry").style.display = "none";
+                document.getElementById("getPlaceButton").style.display = "none";
+                document.getElementById("nearestPlaceHeading").style.display = "none";
+                document.getElementById("output").style.display = "none";
+                document.getElementById("nearestPlace").style.display = "none";
+                document.getElementById("rewardCards").style.display = "none";
+                document.getElementById("insurancePromo").style.display = "none";
+                document.getElementById("screenIndicator").style.display = "none";
+                
+                // Hide menu during profile setup (logo stays visible)
+                document.querySelector(".menu").style.display = "none";
+                
+                // Scroll to top
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            } else {
+                document.getElementById("profileSetupScreen").style.display = "none";
+                
+                // Show menu again (logo stays visible)
+                document.querySelector(".menu").style.display = "block";
+            }
         }
 
         function submitProfile() {
