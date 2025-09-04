@@ -702,6 +702,39 @@ function shareApp() {
     logShareEvent(userPhone, shareId);
 }
 
+// Show Admin Panel
+async function showAdminPanel() {
+    // Simple password check
+    const password = prompt("Enter admin password:");
+    if (password !== "StateFarm") return;
+    
+    // Fetch and display sharing data
+    const { data: shares } = await supabase
+        .from('share_events')
+        .select(`
+            *,
+            share_visits(*)
+        `)
+        .order('shared_at', { ascending: false });
+    
+    // Create admin display
+    let adminHTML = '<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; overflow: auto; padding: 20px;">';
+    adminHTML += '<h2>Sharing Analytics</h2>';
+    adminHTML += '<button onclick="closeAdminPanel()">Close</button>';
+    adminHTML += '<table border="1"><tr><th>Sharer</th><th>Share Date</th><th>Visits</th></tr>';
+    
+    shares.forEach(share => {
+        adminHTML += `<tr>
+            <td>${share.sharer_phone}</td>
+            <td>${new Date(share.shared_at).toLocaleDateString()}</td>
+            <td>${share.share_visits.length}</td>
+        </tr>`;
+    });
+    
+    adminHTML += '</table></div>';
+    
+    document.body.insertAdjacentHTML('beforeend', adminHTML);
+}
 
     </script>
 
