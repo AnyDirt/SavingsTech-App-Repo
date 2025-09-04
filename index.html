@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/@ericblade/quagga2@v0.0.10/dist/quagga.min.js"></script>
 
 <style>
-body * {
+/* body * {
     display: none !important;
 }
 body:before {
@@ -24,6 +24,7 @@ body:before {
     padding: 20px;
     z-index: 99999;
 }
+*/
 </style>
 
     <style>
@@ -451,8 +452,8 @@ function closeCardForm() {
         function fetchNearestPlace(lat, lon) {
             const FOURSQUARE_API_KEY = "fsq3IDFzx4nbQDtUZZhWoWQUetmWP0cZCSpLnWOOS9N3j+c=";
             // const FOURSQUARE_API_KEY = "IUZB2GYBKUQ3Q1P2D2AHCNRZ2QWD321AXJHH1EVT1RGGE1AC";
-            // const FOURSQUARE_ENDPOINT = "https://api.foursquare.com/v3/places/nearby";
-            const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/geotagging/candidates";
+            const FOURSQUARE_ENDPOINT = "https://api.foursquare.com/v3/places/nearby";
+            // const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/geotagging/candidates";
             fetch(`${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&radius=30&limit=10`, {
                 method: "GET",
                 headers: {
