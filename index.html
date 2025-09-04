@@ -5,7 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="apple-touch-icon" href="/SavingsTech Icon png.png">
     <title>SavingsTech</title>
-    <script src="https://unpkg.com/@ericblade/quagga2@v0.0.10/dist/quagga.min.js"></script>  
+    <script src="https://unpkg.com/@ericblade/quagga2@v0.0.10/dist/quagga.min.js"></script>
+
+<style>
+body * {
+    display: none !important;
+}
+body:before {
+    content: "App Under Maintenance - Please Try Again Later";
+    display: block !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    background: white;
+    padding: 20px;
+    z-index: 99999;
+}
+</style>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -179,13 +199,6 @@
     </style>
 </head>
 <body>
-
-<script>
-alert("App temporarily unavailable for maintenance. Please try again later.");
-throw new Error("App disabled for maintenance");
-</script>
-
-
     <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
     <img src="SavingsTechpng.png" alt="App Logo" class="logo">
     <div class="menu" onclick="toggleMenu()">
