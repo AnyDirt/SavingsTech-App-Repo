@@ -658,7 +658,7 @@ function closeCardForm() {
         }
 
 // Log share events
-async function logShareEvent(sharerPhone, shareId) {
+function logShareEvent(sharerPhone, shareId) {
     // You can send this to Supabase or store locally for now
     console.log("Share event:", { sharer: sharerPhone, shareId, timestamp: new Date() });
     
@@ -669,7 +669,7 @@ async function logShareEvent(sharerPhone, shareId) {
 }
 
 // Log when shared links are visited
-async function logShareVisit(referrerPhone, shareId) {
+function logShareVisit(referrerPhone, shareId) {
     console.log("Share visit:", { referrer: referrerPhone, shareId, timestamp: new Date() });
     
     // Optional: Store in localStorage for basic tracking
@@ -702,39 +702,63 @@ function shareApp() {
     logShareEvent(userPhone, shareId);
 }
 
+
 // Show Admin Panel
-async function showAdminPanel() {
+function showAdminPanel() {
     // Simple password check
     const password = prompt("Enter admin password:");
     if (password !== "StateFarm") return;
     
-    // Fetch and display sharing data
-    const { data: shares } = await supabase
-        .from('share_events')
-        .select(`
-            *,
-            share_visits(*)
-        `)
-        .order('shared_at', { ascending: false });
+    // Get data from localStorage instead of Supabase
+    const shareEvents = JSON.parse(localStorage.getItem('shareEvents') || '[]');
+    const shareVisits = JSON.parse(localStorage.getItem('shareVisits') || '[]');
     
     // Create admin display
-    let adminHTML = '<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; overflow: auto; padding: 20px;">';
+    let adminHTML = '<div id="adminPanel" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; overflow: auto; padding: 20px;">';
     adminHTML += '<h2>Sharing Analytics</h2>';
     adminHTML += '<button onclick="closeAdminPanel()">Close</button>';
-    adminHTML += '<table border="1"><tr><th>Sharer</th><th>Share Date</th><th>Visits</th></tr>';
     
-    shares.forEach(share => {
-        adminHTML += `<tr>
-            <td>${share.sharer_phone}</td>
-            <td>${new Date(share.shared_at).toLocaleDateString()}</td>
-            <td>${share.share_visits.length}</td>
-        </tr>`;
-    });
+    if (shareEvents.length === 0) {
+        adminHTML += '<p>No sharing data available yet.</p>';
+    } else {
+        adminHTML += '<h3>Share Events</h3>';
+        adminHTML += '<table border="1" style="width: 100%; margin-bottom: 20px;"><tr><th>Sharer</th><th>Share ID</th><th>Date</th></tr>';
+        
+        shareEvents.forEach(share => {
+            adminHTML += `<tr>
+                <td>${share.sharer}</td>
+                <td>${share.shareId}</td>
+                <td>${new Date(share.timestamp).toLocaleString()}</td>
+            </tr>`;
+        });
+        adminHTML += '</table>';
+        
+        adminHTML += '<h3>Share Visits</h3>';
+        adminHTML += '<table border="1" style="width: 100%;"><tr><th>Referrer</th><th>Share ID</th><th>Visit Date</th></tr>';
+        
+        shareVisits.forEach(visit => {
+            adminHTML += `<tr>
+                <td>${visit.referrer}</td>
+                <td>${visit.shareId}</td>
+                <td>${new Date(visit.timestamp).toLocaleString()}</td>
+            </tr>`;
+        });
+        adminHTML += '</table>';
+    }
     
-    adminHTML += '</table></div>';
+    adminHTML += '</div>';
     
     document.body.insertAdjacentHTML('beforeend', adminHTML);
 }
+
+// Close Admin Panel
+function closeAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    if (panel) {
+        panel.remove();
+    }
+}
+
 
     </script>
 
