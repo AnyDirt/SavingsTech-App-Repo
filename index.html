@@ -27,6 +27,93 @@ body:before {
 */
 </style>
 
+
+
+<style id="maintenanceStyle">
+body * {
+    display: none !important;
+}
+body:before {
+    content: "Checking location...";
+    display: block !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    background: white;
+    padding: 20px;
+    z-index: 99999;
+    text-align: center;
+}
+</style>
+
+<script>
+// Check geolocation and app availability
+function checkLocationAndActivate() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                // Check if location is within allowed bounds
+                if (lat >= 40 && lat <= 44 && lon >= -75 && lon <= -71) {
+                    // Location is valid - remove maintenance mode
+                    const maintenanceStyle = document.getElementById('maintenanceStyle');
+                    if (maintenanceStyle) {
+                        maintenanceStyle.remove();
+                    }
+                } else {
+                    // Outside service area
+                    showMessage("Service not available in your area");
+                }
+            },
+            function(error) {
+                // Geolocation failed
+                showMessage("Location access required. Please enable location services and refresh.");
+            },
+            {
+                timeout: 10000,
+                enableHighAccuracy: true
+            }
+        );
+    } else {
+        showMessage("Geolocation not supported by this browser");
+    }
+}
+
+function showMessage(message) {
+    const style = document.getElementById('maintenanceStyle');
+    if (style) {
+        style.innerHTML = `
+            body * { display: none !important; }
+            body:before { 
+                content: "${message}";
+                display: block !important;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 18px;
+                font-weight: bold;
+                background: white;
+                padding: 20px;
+                z-index: 99999;
+                text-align: center;
+            }
+        `;
+    }
+}
+
+// Run the location check when page loads
+checkLocationAndActivate();
+</script>
+
+
+
+
     <style>
         body {
             font-family: Arial, sans-serif;
