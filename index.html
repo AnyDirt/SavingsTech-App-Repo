@@ -108,6 +108,7 @@ function showMessage(message) {
 
 // Run the location check when page loads
 checkLocationAndActivate();
+
 </script>
 
 
@@ -286,24 +287,30 @@ checkLocationAndActivate();
 <body>
     <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
     <img src="SavingsTechpng.png" alt="App Logo" class="logo">
+
     <div class="menu" onclick="toggleMenu()">
         <div></div>
         <div></div>
         <div></div>
         <span>Menu</span>
     </div>
+
     <div class="menu-dropdown" id="menuDropdown">
         <button onclick="forgetPhoneNumber(); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 13px;">Login with Mobile Number</button>
         <button onclick="registerCreditCards(); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 13px;">Enter Credit Cards By Program Name</button>
         <button onclick="navigateTo('profileSetup'); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 13px;">Set Up Profile for Safety Alerts</button>
         <button onclick="shareApp(); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 12.5px;">Share App with Neighbors & Friends</button>
+        <button id="adminPanelButton" onclick="showAdminPanel(); document.getElementById('menuDropdown').style.display='none';" style="width: 160px; font-size: 13px; display: none;">Admin Panel</button>
     </div>
+
     <h1 id="nearestPlaceHeading" style="font-size: 20px; display: none; margin-top: 0px;">Max Rewards</h1>
+
     <div id="phoneEntry" style="margin-top: 50px;">
         <p>Enter your mobile number to start:</p>
         <input type="tel" id="phoneNumber" placeholder="Enter phone number">
         <button onclick="savePhoneNumber()">Submit</button>
     </div>
+
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
     <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1101am</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
@@ -319,17 +326,56 @@ checkLocationAndActivate();
 
     <script>
 
-        document.addEventListener("DOMContentLoaded", function() {
-            if (localStorage.getItem("userPhoneNumber")) {
-                document.getElementById("phoneEntry").style.display = "none";
-                document.getElementById("getPlaceButton").style.display = "block";
-                document.getElementById("nearestPlaceHeading").style.display = "block";
-                document.getElementById("output").style.display = "block";
-            }
+    document.addEventListener("DOMContentLoaded", function() {
+        // Check for shared link tracking parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const referrer = urlParams.get('ref');
+        const shareId = urlParams.get('sid');
     
-            // Initialize vehicle dropdowns immediately when page loads
-            initializeVehicleDropdownsOnLoad();
-        });
+        if (referrer && shareId) {
+            logShareVisit(referrer, shareId);
+            // Clean up URL to remove tracking parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    
+        // Existing login state check
+        if (localStorage.getItem("userPhoneNumber")) {
+            document.getElementById("phoneEntry").style.display = "none";
+            document.getElementById("getPlaceButton").style.display = "block";
+            document.getElementById("nearestPlaceHeading").style.display = "block";
+            document.getElementById("output").style.display = "block";
+        }
+    
+        // Initialize vehicle dropdowns immediately when page loads
+        initializeVehicleDropdownsOnLoad();
+    });
+
+
+    function checkAdminAccess() {
+        // Define multiple admin phone numbers
+        const ADMIN_PHONES = ["+18607163323", "+1987654321", "+1555123456"];
+    
+        const userPhone = localStorage.getItem("userPhoneNumber");
+        const adminButton = document.getElementById("adminPanelButton");
+    
+        if (adminButton && ADMIN_PHONES.includes(userPhone)) {
+            adminButton.style.display = "block";
+        } else if (adminButton) {
+            adminButton.style.display = "none";
+        }
+    }
+
+    // Call this function when menu is opened
+    function toggleMenu() {
+        let menu = document.getElementById("menuDropdown");
+        if (menu.style.display === "block") {
+            menu.style.display = "none";
+        } else {
+            checkAdminAccess(); // Check admin access before showing menu
+            menu.style.display = "block";
+        }
+    }
+
 
         function initializeVehicleDropdownsOnLoad() {
             // Populate year dropdowns
@@ -511,11 +557,6 @@ function closeCardForm() {
 }
 
 
-        function toggleMenu() {
-            let menu = document.getElementById("menuDropdown");
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
-        }
-
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -615,21 +656,53 @@ function closeCardForm() {
                 document.getElementById("nearestPlace").innerText = "Error fetching places: " + error;
             });
         }
-function shareApp() {
-  const shareText = "This app finds your best card for rewards anywhere and it alerts you to product recalls. From State Farm agent Karen Tessman to help our community save and stay safe.";
 
-  const shareUrl = window.location.href;
-
-  if (navigator.share) {
-    navigator.share({
-      title: "SavingsTech App",
-      text: shareText,
-      url: shareUrl
-    }).catch(err => console.log("Share canceled or failed:", err));
-  } else {
-    window.location.href = `sms:?&body=${encodeURIComponent(shareText + " " + shareUrl)}`;
-  }
+// Log share events
+async function logShareEvent(sharerPhone, shareId) {
+    // You can send this to Supabase or store locally for now
+    console.log("Share event:", { sharer: sharerPhone, shareId, timestamp: new Date() });
+    
+    // Optional: Store in localStorage for basic tracking
+    const shares = JSON.parse(localStorage.getItem('shareEvents') || '[]');
+    shares.push({ sharer: sharerPhone, shareId, timestamp: new Date().toISOString() });
+    localStorage.setItem('shareEvents', JSON.stringify(shares));
 }
+
+// Log when shared links are visited
+async function logShareVisit(referrerPhone, shareId) {
+    console.log("Share visit:", { referrer: referrerPhone, shareId, timestamp: new Date() });
+    
+    // Optional: Store in localStorage for basic tracking
+    const visits = JSON.parse(localStorage.getItem('shareVisits') || '[]');
+    visits.push({ referrer: referrerPhone, shareId, timestamp: new Date().toISOString() });
+    localStorage.setItem('shareVisits', JSON.stringify(visits));
+}
+
+// Share App
+function shareApp() {
+    // Get or generate unique user ID
+    const userPhone = localStorage.getItem("userPhoneNumber") || "unknown";
+    const shareId = Date.now() + Math.random().toString(36).substr(2, 5);
+    
+    const shareText = "This app finds your best card for rewards anywhere and it alerts you to product recalls. From State Farm agent Karen Tessman to help our community save and stay safe.";
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareUrl = `${baseUrl}?ref=${encodeURIComponent(userPhone)}&sid=${shareId}`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: "SavingsTech App",
+            text: shareText,
+            url: shareUrl
+        });
+    } else {
+        window.location.href = `sms:?&body=${encodeURIComponent(shareText + " " + shareUrl)}`;
+    }
+
+    // Log the share attempt
+    logShareEvent(userPhone, shareId);
+}
+
+
     </script>
 
     <div id="profileSetupScreen" class="profile-setup">
