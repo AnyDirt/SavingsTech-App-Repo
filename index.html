@@ -28,7 +28,6 @@ body:before {
 </style>
 
 
-
 <style id="maintenanceStyle">
 body * {
     display: none !important;
@@ -59,7 +58,7 @@ function checkLocationAndActivate() {
                 const lon = position.coords.longitude;
                 
                 // Check if location is within allowed bounds
-                if (lat >= 40 && lat <= 44 && lon >= -75 && lon <= -73) {
+                if (lat >= 40 && lat <= 44 && lon >= -75 && lon <= -71) {
                     // Location is valid - remove maintenance mode
                     const maintenanceStyle = document.getElementById('maintenanceStyle');
                     if (maintenanceStyle) {
@@ -110,8 +109,6 @@ function showMessage(message) {
 // Run the location check when page loads
 checkLocationAndActivate();
 </script>
-
-
 
 
     <style>
