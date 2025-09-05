@@ -312,7 +312,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0803pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0825pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -713,43 +713,97 @@ function showAdminPanel() {
     const shareEvents = JSON.parse(localStorage.getItem('shareEvents') || '[]');
     const shareVisits = JSON.parse(localStorage.getItem('shareVisits') || '[]');
     
-    // Create admin display
-    let adminHTML = '<div id="adminPanel" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10000; overflow: auto; padding: 20px;">';
-    adminHTML += '<h2>Sharing Analytics</h2>';
-    adminHTML += '<button onclick="closeAdminPanel()">Close</button>';
+    // Create admin display with better layout
+    let adminHTML = `
+        <div id="adminPanel" style="
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            z-index: 10000; 
+            overflow: auto; 
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        ">
+            <div style="
+                background: white; 
+                padding: 20px; 
+                border-radius: 10px; 
+                max-width: 90%; 
+                width: 600px; 
+                max-height: 80%; 
+                overflow: auto;
+                margin-top: 50px;
+            ">
+                <h2 style="text-align: center; margin-top: 0;">Sharing Analytics</h2>
+                <button onclick="closeAdminPanel()" style="float: right; margin-bottom: 15px;">Close</button>
+                <div style="clear: both;"></div>
+    `;
     
     if (shareEvents.length === 0) {
-        adminHTML += '<p>No sharing data available yet.</p>';
+        adminHTML += '<p style="text-align: center;">No sharing data available yet.</p>';
     } else {
         adminHTML += '<h3>Share Events</h3>';
-        adminHTML += '<table border="1" style="width: 100%; margin-bottom: 20px;"><tr><th>Sharer</th><th>Share ID</th><th>Date</th></tr>';
+        adminHTML += `
+            <table border="1" style="
+                width: 100%; 
+                margin-bottom: 20px; 
+                border-collapse: collapse; 
+                font-size: 14px;
+            ">
+                <tr style="background-color: #f0f0f0;">
+                    <th style="padding: 8px; text-align: left;">Sharer</th>
+                    <th style="padding: 8px; text-align: left;">Share ID</th>
+                    <th style="padding: 8px; text-align: left;">Date</th>
+                </tr>
+        `;
         
         shareEvents.forEach(share => {
-            adminHTML += `<tr>
-                <td>${share.sharer}</td>
-                <td>${share.shareId}</td>
-                <td>${new Date(share.timestamp).toLocaleString()}</td>
-            </tr>`;
+            adminHTML += `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${share.sharer}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${share.shareId}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${new Date(share.timestamp).toLocaleString()}</td>
+                </tr>
+            `;
         });
         adminHTML += '</table>';
         
         adminHTML += '<h3>Share Visits</h3>';
-        adminHTML += '<table border="1" style="width: 100%;"><tr><th>Referrer</th><th>Share ID</th><th>Visit Date</th></tr>';
+        adminHTML += `
+            <table border="1" style="
+                width: 100%; 
+                border-collapse: collapse; 
+                font-size: 14px;
+            ">
+                <tr style="background-color: #f0f0f0;">
+                    <th style="padding: 8px; text-align: left;">Referrer</th>
+                    <th style="padding: 8px; text-align: left;">Share ID</th>
+                    <th style="padding: 8px; text-align: left;">Visit Date</th>
+                </tr>
+        `;
         
         shareVisits.forEach(visit => {
-            adminHTML += `<tr>
-                <td>${visit.referrer}</td>
-                <td>${visit.shareId}</td>
-                <td>${new Date(visit.timestamp).toLocaleString()}</td>
-            </tr>`;
+            adminHTML += `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${visit.referrer}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${visit.shareId}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${new Date(visit.timestamp).toLocaleString()}</td>
+                </tr>
+            `;
         });
         adminHTML += '</table>';
     }
     
-    adminHTML += '</div>';
+    adminHTML += '</div></div>';
     
     document.body.insertAdjacentHTML('beforeend', adminHTML);
 }
+
 
 // Close Admin Panel
 function closeAdminPanel() {
