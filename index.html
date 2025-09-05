@@ -312,7 +312,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0937pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0946pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -713,7 +713,7 @@ function showAdminPanel() {
     const shareEvents = JSON.parse(localStorage.getItem('shareEvents') || '[]');
     const shareVisits = JSON.parse(localStorage.getItem('shareVisits') || '[]');
     
-    // Create admin display with better layout
+    // Create admin display with mobile-optimized layout
     let adminHTML = `
         <div id="adminPanel" style="
             position: fixed; 
@@ -724,75 +724,76 @@ function showAdminPanel() {
             background: rgba(0,0,0,0.8); 
             z-index: 10000; 
             overflow: auto; 
-            padding: 18px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            padding: 5px;
         ">
             <div style="
                 background: white; 
                 padding: 10px; 
-                border-radius: 10px; 
-                max-width: 95%; 
-                width: 500px; 
-                max-height: 80%; 
+                border-radius: 5px; 
+                width: calc(100% - 10px); 
+                max-height: 90%; 
                 overflow: auto;
-                margin-top: 30px;
+                margin-top: 20px;
             ">
-                <h2 style="text-align: center; margin-top: 0; font-size: 18px;">Sharing Analytics</h2>
-                <button onclick="closeAdminPanel()" style="float: right; margin-bottom: 10px;">Close</button>
-                <div style="clear: both;"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 style="margin: 0; font-size: 16px;">Analytics</h2>
+                    <button onclick="closeAdminPanel()" style="padding: 5px 8px; font-size: 12px;">Close</button>
+                </div>
     `;
-
+    
     if (shareEvents.length === 0) {
-        adminHTML += '<p style="text-align: center;">No sharing data available yet.</p>';
+        adminHTML += '<p style="text-align: center; font-size: 14px;">No sharing data available yet.</p>';
     } else {
-        adminHTML += '<h3>Share Events</h3>';
+        adminHTML += '<h3 style="font-size: 14px; margin: 10px 0 5px 0;">Share Events</h3>';
         adminHTML += `
-            <table border="1" style="
+            <table style="
                 width: 100%; 
-                margin-bottom: 20px; 
+                margin-bottom: 15px; 
                 border-collapse: collapse; 
-                font-size: 14px;
+                font-size: 11px;
             ">
                 <tr style="background-color: #f0f0f0;">
-                    <th style="padding: 8px; text-align: left;">Sharer</th>
-                    <th style="padding: 8px; text-align: left;">Share ID</th>
-                    <th style="padding: 8px; text-align: left;">Date</th>
+                    <th style="padding: 4px; border: 1px solid #ddd; width: 35%;">Sharer</th>
+                    <th style="padding: 4px; border: 1px solid #ddd; width: 25%;">Share ID</th>
+                    <th style="padding: 4px; border: 1px solid #ddd; width: 40%;">Date</th>
                 </tr>
         `;
         
         shareEvents.forEach(share => {
+            const shortDate = new Date(share.timestamp).toLocaleDateString() + ' ' + 
+                             new Date(share.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             adminHTML += `
                 <tr>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${share.sharer}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${share.shareId}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${new Date(share.timestamp).toLocaleString()}</td>
+                    <td style="padding: 4px; border: 1px solid #ddd; word-break: break-all;">${share.sharer}</td>
+                    <td style="padding: 4px; border: 1px solid #ddd; word-break: break-all;">${share.shareId}</td>
+                    <td style="padding: 4px; border: 1px solid #ddd;">${shortDate}</td>
                 </tr>
             `;
         });
         adminHTML += '</table>';
         
-        adminHTML += '<h3>Share Visits</h3>';
+        adminHTML += '<h3 style="font-size: 14px; margin: 10px 0 5px 0;">Share Visits</h3>';
         adminHTML += `
-            <table border="1" style="
+            <table style="
                 width: 100%; 
                 border-collapse: collapse; 
-                font-size: 14px;
+                font-size: 11px;
             ">
                 <tr style="background-color: #f0f0f0;">
-                    <th style="padding: 8px; text-align: left;">Referrer</th>
-                    <th style="padding: 8px; text-align: left;">Share ID</th>
-                    <th style="padding: 8px; text-align: left;">Visit Date</th>
+                    <th style="padding: 4px; border: 1px solid #ddd; width: 35%;">Referrer</th>
+                    <th style="padding: 4px; border: 1px solid #ddd; width: 25%;">Share ID</th>
+                    <th style="padding: 4px; border: 1px solid #ddd; width: 40%;">Visit Date</th>
                 </tr>
         `;
         
         shareVisits.forEach(visit => {
+            const shortDate = new Date(visit.timestamp).toLocaleDateString() + ' ' + 
+                             new Date(visit.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             adminHTML += `
                 <tr>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${visit.referrer}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${visit.shareId}</td>
-                    <td style="padding: 8px; border: 1px solid #ddd;">${new Date(visit.timestamp).toLocaleString()}</td>
+                    <td style="padding: 4px; border: 1px solid #ddd; word-break: break-all;">${visit.referrer}</td>
+                    <td style="padding: 4px; border: 1px solid #ddd; word-break: break-all;">${visit.shareId}</td>
+                    <td style="padding: 4px; border: 1px solid #ddd;">${shortDate}</td>
                 </tr>
             `;
         });
