@@ -735,10 +735,14 @@ function showAdminPanel() {
                 overflow: auto;
                 margin-top: 20px;
             ">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h2 style="margin: 0; font-size: 16px;">Analytics</h2>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="margin: 0; font-size: 16px;">Analytics</h2>
+                <div>
+                    <button onclick="clearShareData()" style="padding: 5px 8px; font-size: 12px; margin-right: 5px; background-color: #dc3545; color: white;">Clear</button>
                     <button onclick="closeAdminPanel()" style="padding: 5px 8px; font-size: 12px;">Close</button>
                 </div>
+            </div>
     `;
     
     if (shareEvents.length === 0) {
@@ -811,6 +815,22 @@ function closeAdminPanel() {
     const panel = document.getElementById('adminPanel');
     if (panel) {
         panel.remove();
+    }
+}
+
+// Clear Share Data
+function clearShareData() {
+    const confirmation = confirm("Are you sure you want to clear all sharing data? This cannot be undone.");
+    if (confirmation) {
+        // Remove share data from localStorage
+        localStorage.removeItem('shareEvents');
+        localStorage.removeItem('shareVisits');
+        
+        // Close and reopen admin panel to refresh display
+        closeAdminPanel();
+        showAdminPanel();
+        
+        alert("Sharing data cleared successfully.");
     }
 }
 
