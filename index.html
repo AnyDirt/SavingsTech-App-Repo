@@ -312,7 +312,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0620pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0634pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -586,79 +586,111 @@ function mapCategoryId(fsqCategoryId) {
 }
 
 function fetchNearestPlace(lat, lon) {
-    // Updated to use the new Places API endpoint with Bearer auth
+    // Use the exact configuration that works from the API dashboard
     const FOURSQUARE_API_KEY = "IUZB2GYBKUQ3Q1P2D2AHCNRZ2QWD321AXJHH1EVT1RGGE1AC";
     const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/places/search";
     
-    fetch(`${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&limit=10`, {
-        method: "GET",
+    // URL encode the coordinates (replace commas with %2C)
+    const encodedLat = encodeURIComponent(lat);
+    const encodedLon = encodeURIComponent(lon);
+    
+    const options = {
+        method: 'GET',
         headers: {
-            "Authorization": `Bearer ${FOURSQUARE_API_KEY}`,
-            "X-Places-Api-Version": '2025-06-17',
-            "Accept": "application/json"
+            accept: 'application/json',
+            'X-Places-Api-Version': '2025-06-17',
+            authorization: `Bearer ${FOURSQUARE_API_KEY}`
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.results && data.results.length > 0) {
-            let filteredResults = data.results.filter(place => {
-                return place.categories && place.categories.some(category => {
-                    // Convert new fsq_category_id to old integer ID
-                    let categoryId = mapCategoryId(category.fsq_category_id);
-                    return (categoryId >= 13000 && categoryId <= 13999) ||
-                           (categoryId >= 17000 && categoryId <= 17999) ||
-                           (categoryId === 19007 || categoryId === 19008 || categoryId === 19009 || categoryId === 19010 || categoryId === 19011 || categoryId === 19012 || categoryId === 19013 || categoryId === 19014 || categoryId === 19015 || categoryId === 19016 || categoryId === 19017 || categoryId === 19018 || categoryId === 19048);
+    };
+    
+    fetch(`${FOURSQUARE_ENDPOINT}?ll=${encodedLat}%2C${encodedLon}&radius=30&limit=10`, options)
+        .then(data => {
+            console.log("API Response:", data); // Debug logging
+            
+            if (data.results && data.results.length > 0) {
+                let filteredResults = data.results.filter(place => {
+                    return place.categories && place.categories.some(category => {
+                        // Handle both old and new category format
+                        let categoryId;
+                        if (category.fsq_category_id) {
+                            // New API format
+                            categoryId = mapCategoryId(category.fsq_category_id);
+                        } else if (category.id) {
+                            // Old API format
+                            categoryId = parseInt(category.id);
+                        } else {
+                            return false;
+                        }
+                        
+                        return (categoryId >= 13000 && categoryId <= 13999) ||
+                               (categoryId >= 17000 && categoryId <= 17999) ||
+                               (categoryId === 19007 || categoryId === 19008 || categoryId === 19009 || categoryId === 19010 || categoryId === 19011 || categoryId === 19012 || categoryId === 19013 || categoryId === 19014 || categoryId === 19015 || categoryId === 19016 || categoryId === 19017 || categoryId === 19018 || categoryId === 19048);
+                    });
                 });
-            });
 
-            if (filteredResults.length > 0) {
-                let nearest = filteredResults.reduce((prev, curr) => (prev.distance < curr.distance ? prev : curr));
-                document.getElementById("nearestPlace").innerHTML = `<span style='font-size: 16px; font-weight: bold;'>${nearest.name} - ${nearest.categories[0]?.short_name || 'Unknown Category'} (Distance: ${nearest.distance}m)</span>`;
-                
-                // Convert the first category's fsq_category_id to old integer ID for existing logic
-                let categoryId = mapCategoryId(nearest.categories[0]?.fsq_category_id);
-                document.getElementById("nearestPlace").dataset.categoryid = categoryId;
-                document.getElementById("screenIndicator").style.display = "block";
+                if (filteredResults.length > 0) {
+                    let nearest = filteredResults.reduce((prev, curr) => {
+                        const prevDist = prev.distance || 0;
+                        const currDist = curr.distance || 0;
+                        return prevDist < currDist ? prev : curr;
+                    });
+                    
+                    const distanceText = nearest.distance ? `(Distance: ${nearest.distance}m)` : '';
+                    document.getElementById("nearestPlace").innerHTML = `<span style='font-size: 16px; font-weight: bold;'>${nearest.name} - ${nearest.categories[0]?.short_name || nearest.categories[0]?.name || 'Unknown Category'} ${distanceText}</span>`;
+                    
+                    // Handle both new and old category ID formats
+                    let categoryId;
+                    if (nearest.categories[0]?.fsq_category_id) {
+                        categoryId = mapCategoryId(nearest.categories[0].fsq_category_id);
+                    } else if (nearest.categories[0]?.id) {
+                        categoryId = parseInt(nearest.categories[0].id);
+                    } else {
+                        categoryId = 0;
+                    }
+                    
+                    document.getElementById("nearestPlace").dataset.categoryid = categoryId;
+                    document.getElementById("screenIndicator").style.display = "block";
 
-                let rewardImage = document.getElementById("rewardCards");
-                rewardImage.src = categoryId % 2 === 1 ? "Top_Cards_1.PNG" : "Top_Cards_2.PNG";
-                rewardImage.style.display = "block";
+                    let rewardImage = document.getElementById("rewardCards");
+                    rewardImage.src = categoryId % 2 === 1 ? "Top_Cards_1.PNG" : "Top_Cards_2.PNG";
+                    rewardImage.style.display = "block";
 
-                const promo = document.getElementById("insurancePromo");
-                const promoMsg = document.getElementById("promoMessage");
-                const promoBtn = document.getElementById("promoButton");
+                    const promo = document.getElementById("insurancePromo");
+                    const promoMsg = document.getElementById("promoMessage");
+                    const promoBtn = document.getElementById("promoButton");
 
-                if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
-                    promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn't.";
-                    document.getElementById("promoSubMessage").textContent = "";
-                    promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
-                    promoBtn.firstElementChild.textContent = "Get a quote";
-                } else if (categoryId % 2 === 1) {
-                    promoMsg.textContent = "Get affordable life insurance in minutes";
-                    document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
-                    promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
-                    promoBtn.firstElementChild.textContent = "Get a quote";
+                    if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
+                        promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn't.";
+                        document.getElementById("promoSubMessage").textContent = "";
+                        promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
+                        promoBtn.firstElementChild.textContent = "Get a quote";
+                    } else if (categoryId % 2 === 1) {
+                        promoMsg.textContent = "Get affordable life insurance in minutes";
+                        document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
+                        promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
+                        promoBtn.firstElementChild.textContent = "Get a quote";
+                    } else {
+                        promoMsg.textContent = "You're already taking care of loved ones.";
+                        document.getElementById("promoSubMessage").textContent = "Let life insurance help carry the load.";
+                        promoBtn.href = "https://www.karenatessmansf.com";
+                        promoBtn.firstElementChild.textContent = "Learn more →";
+                    }
+
+                    promoMsg.style.display = "block";
+                    promoBtn.style.display = "inline-block";
+                    document.getElementById("insurancePromo").style.display = "block";
+
                 } else {
-                    promoMsg.textContent = "You're already taking care of loved ones.";
-                    document.getElementById("promoSubMessage").textContent = "Let life insurance help carry the load.";
-                    promoBtn.href = "https://www.karenatessmansf.com";
-                    promoBtn.firstElementChild.textContent = "Learn more →";
+                    document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
                 }
-
-                promoMsg.style.display = "block";
-                promoBtn.style.display = "inline-block";
-                document.getElementById("insurancePromo").style.display = "block";
-
             } else {
                 document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
             }
-        } else {
-            document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
-        }
-    })
-    .catch(error => {
-        document.getElementById("nearestPlace").innerText = "Error fetching places: " + error;
-    });
+        })
+        .catch(error => {
+            console.error("All API attempts failed:", error);
+            document.getElementById("nearestPlace").innerText = "Error fetching places. Please check your internet connection and try again.";
+        });
 }
 
 
