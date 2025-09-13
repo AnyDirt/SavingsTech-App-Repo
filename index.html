@@ -574,88 +574,94 @@ function closeCardForm() {
             }
         }
 
-        function fetchNearestPlace(lat, lon) {
-            const FOURSQUARE_API_KEY = "fsq3IDFzx4nbQDtUZZhWoWQUetmWP0cZCSpLnWOOS9N3j+c=";
-            // const FOURSQUARE_API_KEY = "IUZB2GYBKUQ3Q1P2D2AHCNRZ2QWD321AXJHH1EVT1RGGE1AC";
-            const FOURSQUARE_ENDPOINT = "https://api.foursquare.com/v3/places/nearby";
-            // const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/geotagging/candidates";
-            fetch(`${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&radius=30&limit=10`, {
-                method: "GET",
-                headers: {
-                    "Authorization": FOURSQUARE_API_KEY,
-                    "Accept": "application/json"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.results && data.results.length > 0) {
-                    let filteredResults = data.results.filter(place => {
-                        return place.categories.some(category => {
-                            let categoryId = parseInt(category.id);
-                            return (categoryId >= 13000 && categoryId <= 13999) ||
-                                   (categoryId >= 17000 && categoryId <= 17999) ||
-                                   (categoryId === 19007 || categoryId === 19008 || categoryId === 19009 || categoryId === 19010 || categoryId === 19011 || categoryId === 19012 || categoryId === 19013 || categoryId === 19014 || categoryId === 19015 || categoryId === 19016 || categoryId === 19017 || categoryId === 19018 || categoryId === 19048);
-                        });
-                    });
 
-                    if (filteredResults.length > 0) {
-                        let nearest = filteredResults.reduce((prev, curr) => (prev.distance < curr.distance ? prev : curr));
-                        document.getElementById("nearestPlace").innerHTML = `<span style='font-size: 16px; font-weight: bold;'>${nearest.name} - ${nearest.categories[0]?.short_name || 'Unknown Category'} (Distance: ${nearest.distance}m)</span>`;
-                        let categoryId  = nearest.categories[0]?.id || 0;
-                        document.getElementById("nearestPlace").dataset.categoryid = categoryId;
-                        document.getElementById("screenIndicator").style.display = "block";
+// Category mapping from fsq_category_id to old integer IDs
+const CATEGORY_MAPPING = {
+    "4d4b7104d754a06370d81259": 10000, "4bf58dd8d48988d182941735": 10001, "5109983191d435c0d71c2bb1": 10002, "4fceea171983d5d06c3e9823": 10003, "4bf58dd8d48988d1e1931735": 10004, "4bf58dd8d48988d1e2931735": 10005, "63be6904847c3692a84b9b20": 10006, "4bf58dd8d48988d1e4931735": 10007, "63be6904847c3692a84b9b21": 10008, "4bf58dd8d48988d17c941735": 10009, "4bf58dd8d48988d1e5931735": 10010, "63be6904847c3692a84b9b22": 10011, "4bf58dd8d48988d1e6931735": 10012, "4bf58dd8d48988d1e7931735": 10013, "63be6904847c3692a84b9b23": 10014, "4bf58dd8d48988d1e8931735": 10015, "4bf58dd8d48988d1e9931735": 10016, "63be6904847c3692a84b9b24": 10017, "4bf58dd8d48988d1ea931735": 10018, "4bf58dd8d48988d1eb931735": 10019, "63be6904847c3692a84b9b25": 10020, "4bf58dd8d48988d1ed931735": 10021, "4bf58dd8d48988d1ef931735": 10022, "63be6904847c3692a84b9b26": 10023, "4bf58dd8d48988d1f0931735": 10024, "4bf58dd8d48988d1f1931735": 10025, "4bf58dd8d48988d1f2931735": 10026, "4bf58dd8d48988d1f3931735": 10027, "63be6904847c3692a84b9b27": 10028, "4bf58dd8d48988d1f4931735": 10029, "63be6904847c3692a84b9bb5": 13000, "4bf58dd8d48988d179941735": 13001, "4bf58dd8d48988d16a941735": 13002, "4bf58dd8d48988d116941735": 13003, "4bf58dd8d48988d1ea941735": 13004, "52e81612bcbc57f1066b7a0d": 13005, "56aa371ce4b08b9a8d57356c": 13006, "4bf58dd8d48988d117941735": 13007, "52e81612bcbc57f1066b7a0e": 13008, "4bf58dd8d48988d11e941735": 13009, "4bf58dd8d48988d118941735": 13010, "4bf58dd8d48988d1d8941735": 13011, "4bf58dd8d48988d119941735": 13012, "4bf58dd8d48988d1d5941735": 13013, "5f2c40f15b4c177b9a6dc684": 13014, "52e81612bcbc57f1066b7a06": 13015, "4bf58dd8d48988d120941735": 13016, "4bf58dd8d48988d121941735": 13017, "4bf58dd8d48988d1e8931735": 13018, "4bf58dd8d48988d11b941735": 13019, "5f2c224bb6d05514c70440a3": 13020, "4bf58dd8d48988d11c941735": 13021, "4bf58dd8d48988d1d4941735": 13022, "4bf58dd8d48988d11d941735": 13023, "56aa371be4b08b9a8d57354d": 13024, "4bf58dd8d48988d122941735": 13025, "4bf58dd8d48988d123941735": 13026, "4bf58dd8d48988d143941735": 13027, "50327c8591d4c4b30a586d5d": 13028, "63be6904847c3692a84b9bb6": 13029, "52e81612bcbc57f1066b7a0c": 13030, "4bf58dd8d48988d16d941735": 13031, "4bf58dd8d48988d1e0931735": 13032, "56aa371be4b08b9a8d573508": 13033, "4bf58dd8d48988d1dc931735": 13034, "4bf58dd8d48988d128941735": 13035, "5e189fd6eee47d000759bbfd": 13036, "52e81612bcbc57f1066b79f2": 13037, "4bf58dd8d48988d1d0941735": 13038, "4bf58dd8d48988d1bc941735": 13039, "512e7cae91d4cbb4e5efe0af": 13040, "5f2c407c5b4c177b9a6dc536": 13041, "4bf58dd8d48988d1c9941735": 13042, "5744ccdfe4b0c0459246b4e2": 13043, "52e81612bcbc57f1066b7a0a": 13044, "62d5af45da6648532de303ee": 13045, "4e0e22f5a56208c4ea9a85a0": 13046, "4bf58dd8d48988d148941735": 13047, "4bf58dd8d48988d120951735": 13048, "56aa371be4b08b9a8d57350b": 13049, "4bf58dd8d48988d1cb941735": 13050, "4bf58dd8d48988d112941735": 13051, "5e189d71eee47d000759b7e2": 13052, "53e510b7498ebcb1801b55d4": 13053, "4d4b7105d754a06374d81259": 13054, "503288ae91d4c4b30a586d67": 13055, "4bf58dd8d48988d1c8941735": 13056, "4bf58dd8d48988d10a941735": 13057, "5f2c344a5b4c177b9a6dc011": 13058, "4bf58dd8d48988d14e941735": 13059, "4bf58dd8d48988d157941735": 13060, "5f2c2b7db6d05514c7044837": 13061, "4bf58dd8d48988d142941735": 13062, "56aa371be4b08b9a8d573568": 13063, "52e81612bcbc57f1066b7a03": 13064, "4bf58dd8d48988d145941735": 13065, "4d4b7105d754a06378d81259": 17000, "5267e446e4b0ec79466e48c4": 17001, "4bf58dd8d48988d116951735": 17002, "4bf58dd8d48988d127951735": 17003, "63be6904847c3692a84b9be2": 17004, "56aa371be4b08b9a8d5734d3": 17005, "63be6904847c3692a84b9be3": 17006, "4eb1c1623b7b52c0e1adc2ec": 17007, "63be6904847c3692a84b9be4": 17008, "5e8f50bd03c7a9000c1e2fbc": 17009, "63be6904847c3692a84b9be5": 17010, "5e8f501a03c7a9000c1e2e88": 17011, "63be6904847c3692a84b9be6": 17012, "63be6904847c3692a84b9be7": 17013, "63be6904847c3692a84b9be8": 17014, "5032833091d4c4b30a586d60": 17015, "59d79d6b2e268052fa2a3332": 17016, "4bf58dd8d48988d124951735": 17017, "52f2ab2ebcbc57f1066b8b32": 17018, "52f2ab2ebcbc57f1066b8b40": 17019, "52f2ab2ebcbc57f1066b8b42": 17020, "4bf58dd8d48988d1f1941735": 17021, "4bf58dd8d48988d114951735": 17022, "52f2ab2ebcbc57f1066b8b30": 17023, "4bf58dd8d48988d104951735": 17024, "63be6904847c3692a84b9be9": 17025, "52f2ab2ebcbc57f1066b8b18": 17026, "63be6904847c3692a84b9bea": 17027, "4eb1bdf03b7b55596b4a7491": 17028, "4bf58dd8d48988d122951735": 17029, "4f04afc02fb6e1c99f3db0bc": 17030, "4bf58dd8d48988d10b951735": 17031, "5454144b498ec1f095bff2f2": 17032, "4d954b0ea243a5684a65b473": 17033, "4bf58dd8d48988d10c951735": 17034, "52f2ab2ebcbc57f1066b8b17": 17035, "63be6904847c3692a84b9beb": 17036, "4bf58dd8d48988d1f6941735": 17037, "52dea92d3cf9994f4e043dbb": 17038, "5745c2e4498e11e7bccabdbd": 17039, "589ddde98ae3635c072819ee": 17040, "4d954afda243a5684865b473": 17041, "63be6904847c3692a84b9bec": 17042, "56aa371be4b08b9a8d5734cb": 17043, "4bf58dd8d48988d11a951735": 17044, "4bf58dd8d48988d105951735": 17045, "4bf58dd8d48988d103951735": 17046, "4bf58dd8d48988d102951735": 17047, "4bf58dd8d48988d111951735": 17048, "4bf58dd8d48988d109951735": 17049, "4bf58dd8d48988d106951735": 17050, "4bf58dd8d48988d107951735": 17051, "63be6904847c3692a84b9bed": 17052, "63be6904847c3692a84b9bee": 17053, "52f2ab2ebcbc57f1066b8b2e": 17054, "4bf58dd8d48988d108951735": 17055, "503287a291d4c4b30a586d65": 17056, "52f2ab2ebcbc57f1066b8b3a": 17057, "4bf58dd8d48988d1f7941735": 17058, "56aa371be4b08b9a8d573505": 17059, "4bf58dd8d48988d11b951735": 17060, "4bf58dd8d48988d1f9941735": 17061, "5370f356bcbc57f1066c94c2": 17062, "4bf58dd8d48988d11d951735": 17063, "4bf58dd8d48988d117951735": 17064, "4bf58dd8d48988d11e951735": 17065, "52f2ab2ebcbc57f1066b8b31": 17066, "5e18993feee47d000759b256": 17067, "58daa1558bbb0b01f18ec1ca": 17068, "4bf58dd8d48988d1fa941735": 17069, "4bf58dd8d48988d10e951735": 17070, "52f2ab2ebcbc57f1066b8b1c": 17071, "4bf58dd8d48988d1f5941735": 17072, "4bf58dd8d48988d118951735": 17073, "52f2ab2ebcbc57f1066b8b45": 17074, "50aa9e744b90af0d42d5de0e": 17075, "52f2ab2ebcbc57f1066b8b2c": 17076, "5f2c41945b4c177b9a6dc7d6": 17077, "63be6904847c3692a84b9bef": 17078, "58daa1558bbb0b01f18ec1e8": 17079, "4bf58dd8d48988d186941735": 17080, "63be6904847c3692a84b9bf0": 17081, "56aa371be4b08b9a8d573564": 17082, "52f2ab2ebcbc57f1066b8b46": 17083, "58daa1558bbb0b01f18ec1e5": 17084, "4bf58dd8d48988d119951735": 17085, "52f2ab2ebcbc57f1066b8b24": 17086, "4bf58dd8d48988d1f8941735": 17087, "52f2ab2ebcbc57f1066b8b2a": 17088, "63be6904847c3692a84b9bf1": 17089, "63be6904847c3692a84b9bf2": 17090, "58daa1558bbb0b01f18ec1b4": 17091, "55888a5a498e782e3303b43a": 17092, "52f2ab2ebcbc57f1066b8b27": 17093, "4eb1c0253b7b52c0e1adc2e9": 17094, "4bf58dd8d48988d128951735": 17095, "4bf58dd8d48988d112951735": 17096, "4bf58dd8d48988d1fb941735": 17097, "52f2ab2ebcbc57f1066b8b25": 17098, "52f2ab2ebcbc57f1066b8b2b": 17099, "52f2ab2ebcbc57f1066b8b29": 17100, "55077a22498e5e9248869ba2": 19007, "5032872391d4c4b30a586d64": 19008, "4bf58dd8d48988d113951735": 19009, "4bf58dd8d48988d1f6931735": 19010, "63be6904847c3692a84b9c24": 19011, "63be6904847c3692a84b9c25": 19012, "4bf58dd8d48988d1f8931735": 19013, "4f4530a74b9074f6e4fb0100": 19014, "63be6904847c3692a84b9c26": 19015, "4bf58dd8d48988d1ee931735": 19016, "4bf58dd8d48988d1fa931735": 19017, "4bf58dd8d48988d132951735": 19018, "4bf58dd8d48988d1ec931735": 19048
+};
 
-                        let rewardImage = document.getElementById("rewardCards");
+// Helper function to convert fsq_category_id to old integer ID
+function mapCategoryId(fsqCategoryId) {
+    return CATEGORY_MAPPING[fsqCategoryId] || 0;
+}
 
-                        // Swipe left to Sentinel if categoryId is in retail ranges
-
-                        rewardImage.src = categoryId % 2 === 1 ? "Top_Cards_1.PNG" : "Top_Cards_2.PNG";
-                        rewardImage.style.display = "block";
-
-                        const promo = document.getElementById("insurancePromo");
-                        const promoMsg = document.getElementById("promoMessage");
-                        const promoBtn = document.getElementById("promoButton");
-
-//reg                   if (!document.getElementById("sentinelScreen").style.display.includes("block")) {
-                          if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
-                              promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn't.";
-                              document.getElementById("promoSubMessage").textContent = "";
-                              promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
-                              // promoBtn.href = "https://www.mayboneeclark.com/insurance-quotes";
-                              promoBtn.firstElementChild.textContent = "Get a quote";
-                          } else if (categoryId % 2 === 1) {
-                              promoMsg.textContent = "Get affordable life insurance in minutes";
-                              document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
-                              // promoBtn.href = "https://www.prudential-lifeplans.com/life-insurance?afid=526342&tfn=ODMzLTIxNi05NDQ3&utm_source=prudential.com&utm_medium=referral";
-                              promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
-                              // promoBtn.href = "https://www.mayboneeclark.com/insurance-quotes";
-                              promoBtn.firstElementChild.textContent = "Get a quote";
-                          } else {
-                              promoMsg.textContent = "You're already taking care of loved ones.";
-                              document.getElementById("promoSubMessage").textContent = "Let life insurance help carry the load.";
-                              // promoBtn.href = "https://www.prudential.com/landing/now-what";
-                              promoBtn.href = "https://www.karenatessmansf.com";
-                              // promoBtn.href = "https://www.mayboneeclark.com/insurance-quotes";
-                              promoBtn.firstElementChild.textContent = "Learn more →";
-                          }
-      
-                          promoMsg.style.display = "block";
-                          promoBtn.style.display = "inline-block";
-                          document.getElementById("insurancePromo").style.display = "block";
-
-//reg                   }                  
-
-                    } else {
-                        document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
-                    }
-                } else {
-                    document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
-                }
-            })
-            .catch(error => {
-                document.getElementById("nearestPlace").innerText = "Error fetching places: " + error;
-            });
+function fetchNearestPlace(lat, lon) {
+    // Updated to use the new Places API endpoint with Bearer auth
+    const FOURSQUARE_API_KEY = "IUZB2GYBKUQ3Q1P2D2AHCNRZ2QWD321AXJHH1EVT1RGGE1AC";
+    const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/places/search";
+    
+    fetch(`${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&radius=30&limit=10`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${FOURSQUARE_API_KEY}`,
+            "Accept": "application/json"
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.results && data.results.length > 0) {
+            let filteredResults = data.results.filter(place => {
+                return place.categories && place.categories.some(category => {
+                    // Convert new fsq_category_id to old integer ID
+                    let categoryId = mapCategoryId(category.fsq_category_id);
+                    return (categoryId >= 13000 && categoryId <= 13999) ||
+                           (categoryId >= 17000 && categoryId <= 17999) ||
+                           (categoryId === 19007 || categoryId === 19008 || categoryId === 19009 || categoryId === 19010 || categoryId === 19011 || categoryId === 19012 || categoryId === 19013 || categoryId === 19014 || categoryId === 19015 || categoryId === 19016 || categoryId === 19017 || categoryId === 19018 || categoryId === 19048);
+                });
+            });
+
+            if (filteredResults.length > 0) {
+                let nearest = filteredResults.reduce((prev, curr) => (prev.distance < curr.distance ? prev : curr));
+                document.getElementById("nearestPlace").innerHTML = `<span style='font-size: 16px; font-weight: bold;'>${nearest.name} - ${nearest.categories[0]?.short_name || 'Unknown Category'} (Distance: ${nearest.distance}m)</span>`;
+                
+                // Convert the first category's fsq_category_id to old integer ID for existing logic
+                let categoryId = mapCategoryId(nearest.categories[0]?.fsq_category_id);
+                document.getElementById("nearestPlace").dataset.categoryid = categoryId;
+                document.getElementById("screenIndicator").style.display = "block";
+
+                let rewardImage = document.getElementById("rewardCards");
+                rewardImage.src = categoryId % 2 === 1 ? "Top_Cards_1.PNG" : "Top_Cards_2.PNG";
+                rewardImage.style.display = "block";
+
+                const promo = document.getElementById("insurancePromo");
+                const promoMsg = document.getElementById("promoMessage");
+                const promoBtn = document.getElementById("promoButton");
+
+                if (categoryId === 19006 || categoryId === 19007 || categoryId === 19057) {
+                    promoMsg.textContent = "Your next road trip could be unpredictable. Make sure your coverage isn't.";
+                    document.getElementById("promoSubMessage").textContent = "";
+                    promoBtn.href = "https://www.karenatessmansf.com/insurance/auto";
+                    promoBtn.firstElementChild.textContent = "Get a quote";
+                } else if (categoryId % 2 === 1) {
+                    promoMsg.textContent = "Get affordable life insurance in minutes";
+                    document.getElementById("promoSubMessage").textContent = "Skip the medical exam, answer a few questions, and get a quick response.";
+                    promoBtn.href = "https://www.karenatessmansf.com/insurance/life";
+                    promoBtn.firstElementChild.textContent = "Get a quote";
+                } else {
+                    promoMsg.textContent = "You're already taking care of loved ones.";
+                    document.getElementById("promoSubMessage").textContent = "Let life insurance help carry the load.";
+                    promoBtn.href = "https://www.karenatessmansf.com";
+                    promoBtn.firstElementChild.textContent = "Learn more →";
+                }
+
+                promoMsg.style.display = "block";
+                promoBtn.style.display = "inline-block";
+                document.getElementById("insurancePromo").style.display = "block";
+
+            } else {
+                document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
+            }
+        } else {
+            document.getElementById("nearestPlace").innerText = "No nearby merchants found.";
+        }
+    })
+    .catch(error => {
+        document.getElementById("nearestPlace").innerText = "Error fetching places: " + error;
+    });
+}
+
+
+
 
 // Log share events
 function logShareEvent(sharerPhone, shareId) {
