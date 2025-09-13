@@ -594,6 +594,7 @@ function fetchNearestPlace(lat, lon) {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${FOURSQUARE_API_KEY}`,
+            "X-Places-Api-Version": '2025-06-17',
             "Accept": "application/json"
         }
     })
