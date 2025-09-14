@@ -312,7 +312,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1024am</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1033am</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -586,8 +586,8 @@ function closeCardForm() {
             fetch(`${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&limit=10`, {
                 method: "GET",
                 headers: {
-                    "Authorization": FOURSQUARE_API_KEY,
-                    "Accept": "application/json"
+                    "Accept": "application/json",
+                    "Authorization": FOURSQUARE_API_KEY
                 }
             })
             .then(response => response.json())
