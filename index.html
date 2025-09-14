@@ -312,7 +312,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1023pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1042pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -585,14 +585,15 @@ function mapCategoryId(fsqCategoryId) {
     return CATEGORY_MAPPING[fsqCategoryId] || 0;
 }
 
+
+
 function fetchNearestPlace(lat, lon) {
-    // Use the exact configuration that works from the API dashboard
     const FOURSQUARE_API_KEY = "IUZB2GYBKUQ3Q1P2D2AHCNRZ2QWD321AXJHH1EVT1RGGE1AC";
     const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/geotagging/candidates";
     
-    // URL encode the coordinates (replace commas with %2C)
-    const encodedLat = encodeURIComponent(lat);
-    const encodedLon = encodeURIComponent(lon);
+    // Format coordinates the same way as the working example
+    const formattedCoords = `${lat},${lon}`;
+    const encodedCoords = encodeURIComponent(formattedCoords);
     
     const options = {
         method: 'GET',
@@ -603,8 +604,20 @@ function fetchNearestPlace(lat, lon) {
         }
     };
     
-    fetch(`${FOURSQUARE_ENDPOINT}?ll=${encodedLat}%2C${encodedLon}`, options)
-        .then(response => response.json())
+    // Construct URL to match working example format
+    const url = `${FOURSQUARE_ENDPOINT}?ll=${encodedCoords}`;
+    
+    console.log("Making API request to:", url); // Debug logging
+    
+    fetch(url, options)
+        .then(response => {
+            console.log("Response status:", response.status); // Debug logging
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log("API Response:", data); // Debug logging
             
@@ -689,11 +702,10 @@ function fetchNearestPlace(lat, lon) {
             }
         })
         .catch(error => {
-            console.error("All API attempts failed:", error);
+            console.error("API call failed:", error);
             document.getElementById("nearestPlace").innerText = "Error fetching places. Please check your internet connection and try again.";
         });
 }
-
 
 
 
