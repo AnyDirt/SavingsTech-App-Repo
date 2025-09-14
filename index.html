@@ -580,8 +580,15 @@ function closeCardForm() {
             const FOURSQUARE_ENDPOINT = "https://api.foursquare.com/v3/places/nearby";
             // const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/geotagging/candidates";
 
-    const url = `${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&radius=30&limit=10}`;
-console.log("Making API request to:", url); // Debug logging
+    const url = `${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&radius=30&limit=10}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": FOURSQUARE_API_KEY,
+                    "Accept": "application/json"
+                }
+}); // Debug logging
+
+console.log("Making API request to:", url)
 
             fetch(`${FOURSQUARE_ENDPOINT}?ll=${lat},${lon}&radius=30&limit=10`, {
                 method: "GET",
