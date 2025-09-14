@@ -588,7 +588,7 @@ function mapCategoryId(fsqCategoryId) {
 function fetchNearestPlace(lat, lon) {
     // Use the exact configuration that works from the API dashboard
     const FOURSQUARE_API_KEY = "IUZB2GYBKUQ3Q1P2D2AHCNRZ2QWD321AXJHH1EVT1RGGE1AC";
-    const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/places/search";
+    const FOURSQUARE_ENDPOINT = "https://places-api.foursquare.com/geotagging/candidates";
     
     // URL encode the coordinates (replace commas with %2C)
     const encodedLat = encodeURIComponent(lat);
@@ -603,7 +603,7 @@ function fetchNearestPlace(lat, lon) {
         }
     };
     
-    fetch(`${FOURSQUARE_ENDPOINT}?ll=${encodedLat}%2C${encodedLon}&radius=30000&limit=10`, options)
+    fetch(`${FOURSQUARE_ENDPOINT}?ll=${encodedLat}%2C${encodedLon}`, options)
         .then(response => response.json())
         .then(data => {
             console.log("API Response:", data); // Debug logging
