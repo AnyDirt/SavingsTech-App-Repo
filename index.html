@@ -48,7 +48,8 @@
       const lat = document.getElementById("lat").value;
       const lon = document.getElementById("lon").value;
 
-      const url = `https://places-api.foursquare.com/geotagging/candidates?fields=name%2Cdistance%2Ccategories&ll=${lat}%2C${lon}&limit=10`;
+      // const url = `https://places-api.foursquare.com/geotagging/candidates?fields=name%2Cdistance%2Ccategories&ll=${lat}%2C${lon}&limit=10`;
+      const url = `/.netlify/functions/geotag?lat=${lat}&lon=${lon}`;
 
       const options = {
         method: 'GET',
