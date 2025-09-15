@@ -43,52 +43,51 @@
 
   <ul id="results"></ul>
 
-  <script>
-    async function fetchCandidates() {
-      const lat = document.getElementById("lat").value;
-      const lon = document.getElementById("lon").value;
 
-      // const url = `https://places-api.foursquare.com/geotagging/candidates?fields=name%2Cdistance%2Ccategories&ll=${lat}%2C${lon}&limit=10`;
-      const url = `/.netlify/functions/geotag?lat=${lat}&lon=${lon}`;
+<script>
+async function fetchCandidates() {
+  const lat = document.getElementById("lat").value;
+  const lon = document.getElementById("lon").value;
 
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          'X-Places-Api-Version': '2025-06-17',
-          authorization: 'Bearer IUZB2GYBKUQ3Q1P2D2AHCNRZ2QWD321AXJHH1EVT1RGGE1AC'
-        }
-      };
+  const url = `/.netlify/functions/geotag?lat=${lat}&lon=${lon}&limit=10`;
 
-      const resultsContainer = document.getElementById('results');
-      resultsContainer.innerHTML = 'Loading...';
+  const el = document.getElementById('results');
+  el.innerHTML = 'Loading…';
 
-      try {
-        const res = await fetch(url, options);
-        const data = await res.json();
-        resultsContainer.innerHTML = '';
+  try {
+    const res = await fetch(url);
+    const payload = await res.json();
 
-        if (data?.results?.length > 0) {
-          data.results.forEach(place => {
-            const li = document.createElement('li');
-            const categories = place.categories.map(cat => cat.name).join(', ');
-            li.innerHTML = `<strong>${place.name}</strong><br>
-                            Distance: ${place.distance} meters<br>
-                            Categories: ${categories}`;
-            resultsContainer.appendChild(li);
-          });
-        } else {
-          resultsContainer.innerHTML = '<li>No results found.</li>';
-        }
-      } catch (err) {
-        console.error(err);
-        resultsContainer.innerHTML = '<li>Error fetching data.</li>';
-      }
+    // Look for "candidates" array (main output of this endpoint)
+    const raw = payload?.data;
+    const list = raw?.candidates ?? [];
+
+    el.innerHTML = '';
+    if (Array.isArray(list) && list.length) {
+      list.forEach(p => {
+        const li = document.createElement('li');
+        const cats = (p.categories || []).map(c => c.name).join(', ');
+        li.innerHTML = `<strong>${p.name ?? '(no name)'}</strong><br>
+                        Distance: ${p.distance ?? '—'} m<br>
+                        Categories: ${cats || '—'}`;
+        el.appendChild(li);
+      });
+    } else {
+      // Debug block helps check exact payload if empty
+      el.innerHTML = `<li>No results found.</li>
+                      <li style="white-space:pre; font-size:12px; opacity:.7">
+                        debug: ${JSON.stringify(payload).slice(0, 800)}…
+                      </li>`;
     }
+  } catch (e) {
+    console.error(e);
+    el.innerHTML = '<li>Error fetching data.</li>';
+  }
+}
 
-    // Fetch default location on load
-    window.onload = fetchCandidates;
-  </script>
+window.onload = fetchCandidates;
+</script>
+
 
 </body>
 </html>
