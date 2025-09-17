@@ -1,8 +1,15 @@
 // netlify/functions/geotag.js
 export async function handler(event) {
-  const lat = event.queryStringParameters.lat || '41.9376858';
-  const lon = event.queryStringParameters.lon || '-72.7181456';
+  const lat = event.queryStringParameters.lat;
+  const lon = event.queryStringParameters.lon;
   const limit = event.queryStringParameters.limit || '10';
+
+  if (!lat || !lon) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ ok: false, error: "Missing required lat/lon parameters" })
+    };
+  }
 
   const url = `https://places-api.foursquare.com/geotagging/candidates?ll=${lat},${lon}&limit=${limit}&fields=name,distance,categories`;
 
@@ -12,7 +19,7 @@ export async function handler(event) {
       headers: {
         accept: 'application/json',
         'X-Places-Api-Version': '2025-06-17',
-        authorization: `Bearer ${process.env.FSQ_API_KEY}` // keep API key safe in env
+        authorization: `Bearer ${process.env.FSQ_API_KEY}` // stored securely in Netlify env
       }
     });
 
