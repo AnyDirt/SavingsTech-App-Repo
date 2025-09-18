@@ -312,7 +312,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0750pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0817pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -589,7 +589,7 @@ function mapCategoryId(fsqCategoryId) {
 
 function fetchNearestPlace(lat, lon) {
     // Call serverless function for geotagging candidates
-    const url = `/.netlify/functions/geotag?lat=${lat}&lon=${lon}&limit=10`;
+    const url = `/.netlify/functions/geotag?lat=${lat}&lon=${lon}&limit=3`;
     
     console.log("Making API request to:", url); // Debug logging
     
