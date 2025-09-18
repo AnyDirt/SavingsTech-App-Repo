@@ -312,7 +312,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0845pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0911pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
@@ -998,44 +998,60 @@ function clearShareData() {
 
     <script>
 
-        function navigateTo(screen) {
-            if (screen === 'profileSetup') {
-                // Show profile setup screen
-                document.getElementById("profileSetupScreen").style.display = "block";
 
-                // Debug: Check if we have saved profile data
-                console.log("Opening profile setup...");
-                console.log("Saved profile data:", localStorage.getItem("userProfile"));
+function navigateTo(screen) {
+    if (screen === 'profileSetup') {
+        // Show profile setup screen
+        document.getElementById("profileSetupScreen").style.display = "block";
 
-        
-                // Load saved profile data
-                setTimeout(loadSavedProfile, 100);
-        
-                // Hide ALL other screens and elements completely
-                document.getElementById("sentinelScreen").style.display = "none";
-                document.getElementById("maxAlertsScreen").style.display = "none";
-                document.getElementById("phoneEntry").style.display = "none";
-                document.getElementById("getPlaceButton").style.display = "none";
-                document.getElementById("nearestPlaceHeading").style.display = "none";
-                document.getElementById("output").style.display = "none";
-                document.getElementById("nearestPlace").style.display = "none";
-                document.getElementById("rewardCards").style.display = "none";
-                document.getElementById("insurancePromo").style.display = "none";
-                document.getElementById("screenIndicator").style.display = "none";
-        
-                // Hide menu during profile setup (logo stays visible)
-                document.querySelector(".menu").style.display = "none";
-        
-                // Scroll to top
-                document.body.scrollTop = 0;
-                document.documentElement.scrollTop = 0;
-            } else {
-                document.getElementById("profileSetupScreen").style.display = "none";
-        
-                // Show menu again (logo stays visible)
-                document.querySelector(".menu").style.display = "block";
-            }
-        }
+        // Debug: Check if we have saved profile data
+        console.log("Opening profile setup...");
+        console.log("Saved profile data:", localStorage.getItem("userProfile"));
+
+        // Load saved profile data
+        setTimeout(loadSavedProfile, 100);
+
+        // Hide ALL other screens and elements completely
+        document.getElementById("sentinelScreen").style.display = "none";
+        document.getElementById("maxAlertsScreen").style.display = "none";
+        document.getElementById("phoneEntry").style.display = "none";
+        document.getElementById("getPlaceButton").style.display = "none";
+        document.getElementById("nearestPlaceHeading").style.display = "none";
+        document.getElementById("output").style.display = "none";
+        document.getElementById("nearestPlace").style.display = "none";
+        document.getElementById("rewardCards").style.display = "none";
+        document.getElementById("insurancePromo").style.display = "none";
+        document.getElementById("screenIndicator").style.display = "none";
+
+        // Hide menu during profile setup (logo stays visible)
+        document.querySelector(".menu").style.display = "none";
+
+        // Scroll to top
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    } else if (screen === 'maxAlerts') {
+        // Show Max Alerts screen
+        document.getElementById("maxAlertsScreen").style.display = "block";
+        document.getElementById("profileSetupScreen").style.display = "none";
+        document.getElementById("sentinelScreen").style.display = "none";
+        document.getElementById("phoneEntry").style.display = "none";
+        document.getElementById("getPlaceButton").style.display = "none";
+        document.getElementById("nearestPlaceHeading").style.display = "none";
+        document.getElementById("output").style.display = "none";
+        document.getElementById("nearestPlace").style.display = "none";
+        document.getElementById("rewardCards").style.display = "none";
+        document.getElementById("insurancePromo").style.display = "none";
+        document.getElementById('barcodeFollowup').style.display = 'none';
+        loadVehicleRecalls();
+    } else {
+        document.getElementById("profileSetupScreen").style.display = "none";
+        document.getElementById("maxAlertsScreen").style.display = "none";
+
+        // Show menu again (logo stays visible)
+        document.querySelector(".menu").style.display = "block";
+    }
+}
+
 
 
         function submitProfile() {
@@ -1521,21 +1537,6 @@ document.addEventListener('touchend', handleTouchEnd, false);
 </div>
 
 <script>
-    function navigateTo(screen) {
-        document.getElementById("profileSetupScreen").style.display = screen === 'profileSetup' ? "block" : "none";
-        document.getElementById("maxAlertsScreen").style.display = screen === 'maxAlerts' ? "block" : "none";
-        if (document.getElementById("maxAlertsScreen")?.style.display === "block") {
-            document.getElementById("sentinelScreen").style.display = "none";
-            document.getElementById("phoneEntry").style.display = "none";
-            document.getElementById("getPlaceButton").style.display = "none";
-            document.getElementById("nearestPlaceHeading").style.display = "none";
-            document.getElementById("output").style.display = "none";
-            document.getElementById("nearestPlace").style.display = "none";
-            document.getElementById("rewardCards").style.display = "none";
-            document.getElementById("insurancePromo").style.display = "none";
-            document.getElementById('barcodeFollowup').style.display = 'none';
-        }
-    }
 
     // Helper function to parse DD/MM/YYYY format and convert to MM/DD/YYYY display format
     function parseDateFromDDMMYYYY(dateStr) {
