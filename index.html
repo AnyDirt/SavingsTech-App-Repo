@@ -6,6 +6,7 @@
     <link rel="apple-touch-icon" href="/SavingsTech Icon png.png">
     <title>SavingsTech</title>
     <script src="https://unpkg.com/@ericblade/quagga2@v0.0.10/dist/quagga.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <style>
 /* body * {
@@ -26,7 +27,6 @@ body:before {
 }
 */
 </style>
-
 
 <style id="maintenanceStyle">
 body * {
@@ -108,9 +108,7 @@ function showMessage(message) {
 
 // Run the location check when page loads
 checkLocationAndActivate();
-
 </script>
-
 
     <style>
         body {
@@ -282,6 +280,72 @@ checkLocationAndActivate();
             font-size: 14px;
             line-height: 1.4;
         }
+
+        /* Top Card Display Styles */
+        .top-cards-container {
+            display: none;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        .card-row {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .card-image {
+            width: 90px;
+            height: 57px;
+            object-fit: contain;
+            margin-right: 15px;
+            border-radius: 4px;
+        }
+        .card-info {
+            flex: 1;
+            text-align: left;
+        }
+        .card-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        .card-bank {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .rate-display {
+            text-align: right;
+            min-width: 60px;
+        }
+        .rate-value {
+            font-weight: bold;
+            font-size: 16px;
+            color: #0070C0;
+        }
+        .dual-rates {
+            display: flex;
+            gap: 15px;
+        }
+        .rate-column {
+            text-align: center;
+            min-width: 60px;
+        }
+        .rate-heading {
+            font-size: 10px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        .no-cards-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -314,6 +378,13 @@ checkLocationAndActivate();
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
     <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0955pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
+    
+    <!-- Top Cards Display (replaces old reward cards image) -->
+    <div id="topCardsContainer" class="top-cards-container">
+        <div id="topCardsDisplay"></div>
+    </div>
+    
+    <!-- Keep old image as fallback -->
     <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
 
     <div id="insurancePromo" style="display: none; margin-top: 40px;">
@@ -325,57 +396,411 @@ checkLocationAndActivate();
     </div>
 
     <script>
+        // Global variables for Top Card Logic
+        let cardDatabase = [];
+        let topCardCalculator = null;
 
-    document.addEventListener("DOMContentLoaded", function() {
-        // Check for shared link tracking parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const referrer = urlParams.get('ref');
-        const shareId = urlParams.get('sid');
-    
-        if (referrer && shareId) {
-            logShareVisit(referrer, shareId);
-            // Clean up URL to remove tracking parameters
-            window.history.replaceState({}, document.title, window.location.pathname);
+        // Top Card Calculator Class
+        class TopCardCalculator {
+            constructor(cardDatabase) {
+                this.cardDatabase = cardDatabase;
+            }
+
+            calculateTopCards(userCards, merchantName, merchantCode1, merchantCode2 = null, transactionDate = new Date()) {
+                const availableCards = this.filterUserCards(userCards);
+                
+                const cardRates = availableCards.map(card => {
+                    const rate1 = this.calculateCardRate(card, merchantName, merchantCode1, transactionDate);
+                    let rate2 = null;
+                    
+                    if (merchantCode2) {
+                        rate2 = this.calculateCardRate(card, merchantName, merchantCode2, transactionDate);
+                    }
+                    
+                    return {
+                        card: card,
+                        rate1: rate1,
+                        rate2: rate2,
+                        maxRate: Math.max(rate1, rate2 || 0)
+                    };
+                });
+
+                const sortedCards = cardRates.sort((a, b) => b.maxRate - a.maxRate);
+                
+                if (merchantCode2) {
+                    return this.ensureBestForBothCodes(sortedCards, merchantCode1, merchantCode2);
+                }
+                
+                return sortedCards.slice(0, 3);
+            }
+
+            filterUserCards(userCards) {
+                return this.cardDatabase.filter(dbCard => 
+                    userCards.some(userCard => 
+                        this.normalizeString(dbCard.cardName) === this.normalizeString(userCard.program) &&
+                        this.normalizeString(dbCard.issuingBank) === this.normalizeString(userCard.bank)
+                    )
+                );
+            }
+
+            calculateCardRate(card, merchantName, merchantCode, transactionDate) {
+                const dateObj = new Date(transactionDate);
+                
+                // Check name1 match
+                if (card.name1 && this.isValidDateRange(dateObj, card.nameStartDate1, card.nameEndDate1)) {
+                    if (this.merchantMatches(merchantName, card.name1)) {
+                        return this.convertToEffectiveRate(card.nameRate1, card.rewardsType, card.rewardsConvRate);
+                    }
+                }
+                
+                // Check name2 match
+                if (card.name2 && this.isValidDateRange(dateObj, card.nameStartDate2, card.nameEndDate2)) {
+                    if (this.merchantMatches(merchantName, card.name2)) {
+                        return this.convertToEffectiveRate(card.nameRate2, card.rewardsType, card.rewardsConvRate);
+                    }
+                }
+                
+                // Check category matches
+                for (let i = 1; i <= 5; i++) {
+                    const categoryId = card[`categoryId${i}`];
+                    const rate = card[`rate${i}`];
+                    const startDate = card[`startDate${i}`];
+                    const endDate = card[`endDate${i}`];
+                    
+                    if (categoryId && rate && this.isValidDateRange(dateObj, startDate, endDate)) {
+                        if (this.categoryMatches(merchantCode, categoryId)) {
+                            return this.convertToEffectiveRate(rate, card.rewardsType, card.rewardsConvRate);
+                        }
+                    }
+                }
+                
+                // Check category ranges
+                const categoryRanges = this.findCategoryRanges(card);
+                for (const range of categoryRanges) {
+                    if (this.isValidDateRange(dateObj, range.startDate, range.endDate)) {
+                        if (merchantCode >= range.startCategoryId && merchantCode <= range.endCategoryId) {
+                            return this.convertToEffectiveRate(range.rate, card.rewardsType, card.rewardsConvRate);
+                        }
+                    }
+                }
+                
+                // Default: All Other Purchases
+                if (card.rateAOP && this.isValidDateRange(dateObj, card.startDateAOP, card.endDateAOP)) {
+                    return this.convertToEffectiveRate(card.rateAOP, card.rewardsType, card.rewardsConvRate);
+                }
+                
+                return 0;
+            }
+
+            findCategoryRanges(card) {
+                const ranges = [];
+                const categories = [];
+                
+                for (let i = 1; i <= 5; i++) {
+                    const categoryId = card[`categoryId${i}`];
+                    const categoryName = card[`categoryName${i}`];
+                    const rate = card[`rate${i}`];
+                    const startDate = card[`startDate${i}`];
+                    const endDate = card[`endDate${i}`];
+                    
+                    if (categoryId && categoryName && rate) {
+                        categories.push({
+                            id: categoryId,
+                            name: categoryName,
+                            rate: rate,
+                            startDate: startDate,
+                            endDate: endDate
+                        });
+                    }
+                }
+                
+                for (let i = 0; i < categories.length - 1; i++) {
+                    const current = categories[i];
+                    const next = categories[i + 1];
+                    
+                    if (current.name === next.name && 
+                        current.rate === next.rate && 
+                        current.startDate === next.startDate && 
+                        current.endDate === next.endDate) {
+                        ranges.push({
+                            startCategoryId: Math.min(current.id, next.id),
+                            endCategoryId: Math.max(current.id, next.id),
+                            rate: current.rate,
+                            startDate: current.startDate,
+                            endDate: current.endDate
+                        });
+                    }
+                }
+                
+                return ranges;
+            }
+
+            convertToEffectiveRate(rate, rewardsType, conversionRate) {
+                if (rewardsType === 'cashback') {
+                    return rate;
+                } else if (rewardsType === 'points' || rewardsType === 'miles') {
+                    return rate * conversionRate;
+                }
+                return rate;
+            }
+
+            merchantMatches(merchantName, cardMerchantName) {
+                return this.normalizeString(merchantName).includes(this.normalizeString(cardMerchantName)) ||
+                       this.normalizeString(cardMerchantName).includes(this.normalizeString(merchantName));
+            }
+
+            categoryMatches(merchantCode, categoryId) {
+                return parseInt(merchantCode) === parseInt(categoryId);
+            }
+
+            isValidDateRange(currentDate, startDate, endDate) {
+                if (!startDate || !endDate) return true;
+                
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                return currentDate >= start && currentDate <= end;
+            }
+
+            normalizeString(str) {
+                return str ? str.toLowerCase().trim() : '';
+            }
+
+            ensureBestForBothCodes(sortedCards, merchantCode1, merchantCode2) {
+                const result = [];
+                
+                const bestForCode1 = sortedCards.find(cardRate => 
+                    cardRate.rate1 >= (cardRate.rate2 || 0)
+                );
+                
+                const bestForCode2 = sortedCards.find(cardRate => 
+                    (cardRate.rate2 || 0) >= cardRate.rate1
+                );
+                
+                if (bestForCode1) result.push(bestForCode1);
+                if (bestForCode2 && bestForCode2 !== bestForCode1) result.push(bestForCode2);
+                
+                for (const cardRate of sortedCards) {
+                    if (result.length >= 3) break;
+                    if (!result.includes(cardRate)) {
+                        result.push(cardRate);
+                    }
+                }
+                
+                return result.slice(0, 3);
+            }
+
+            getColumnHeading(merchantCode) {
+                const code = parseInt(merchantCode);
+                if (code === 19009) return "Fuel Pump";
+                if (code === 19008) return "EV Charge";
+                return "Store";
+            }
+
+            formatDisplayResult(topCards, merchantCode1, merchantCode2 = null) {
+                const result = {
+                    cards: [],
+                    hasDualCodes: !!merchantCode2,
+                    code1Heading: merchantCode2 ? this.getColumnHeading(merchantCode1) : null,
+                    code2Heading: merchantCode2 ? this.getColumnHeading(merchantCode2) : null
+                };
+
+                topCards.forEach(cardRate => {
+                    result.cards.push({
+                        cardName: cardRate.card.cardName,
+                        issuingBank: cardRate.card.issuingBank,
+                        imageUrl: cardRate.card.imageUrl,
+                        rate1: (cardRate.rate1 * 100).toFixed(2),
+                        rate2: cardRate.rate2 ? (cardRate.rate2 * 100).toFixed(2) : null,
+                        maxRate: (cardRate.maxRate * 100).toFixed(2)
+                    });
+                });
+
+                return result;
+            }
         }
-    
-        // Existing login state check
-        if (localStorage.getItem("userPhoneNumber")) {
-            document.getElementById("phoneEntry").style.display = "none";
-            document.getElementById("getPlaceButton").style.display = "block";
-            document.getElementById("nearestPlaceHeading").style.display = "block";
-            document.getElementById("output").style.display = "block";
+
+        // Load card database from CSV
+        async function loadCardDatabase() {
+            try {
+                // Load from your actual CSV file
+                const response = await fetch('/Layout with Sample Data in CSV UTF8.csv');
+                const csvText = await response.text();
+                
+                const parsedData = Papa.parse(csvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    transformHeader: (header) => header.trim()
+                });
+                
+                if (parsedData.errors && parsedData.errors.length > 0) {
+                    console.warn("CSV parsing warnings:", parsedData.errors);
+                }
+                
+                cardDatabase = parsedData.data.filter(card => card.issuingBank && card.cardName);
+                topCardCalculator = new TopCardCalculator(cardDatabase);
+                console.log(`Loaded ${cardDatabase.length} cards from database`);
+                
+            } catch (error) {
+                console.error("Error loading card database:", error);
+                // Use empty database as fallback
+                cardDatabase = [];
+                topCardCalculator = new TopCardCalculator(cardDatabase);
+                console.log("Using empty card database due to loading error");
+            }
         }
-    
-        // Initialize vehicle dropdowns immediately when page loads
-        initializeVehicleDropdownsOnLoad();
-    });
 
+        // Display top cards results
+        function displayTopCards(topCardsResult, merchantName) {
+            const container = document.getElementById('topCardsDisplay');
+            const topCardsContainer = document.getElementById('topCardsContainer');
+            
+            if (!topCardsResult || !topCardsResult.cards || topCardsResult.cards.length === 0) {
+                container.innerHTML = `
+                    <div class="no-cards-message">
+                        <p>No matching credit cards found.</p>
+                        <p>Add your cards via the menu to see personalized rewards.</p>
+                    </div>
+                `;
+                topCardsContainer.style.display = 'block';
+                return;
+            }
 
-    function checkAdminAccess() {
-        // Define multiple admin phone numbers
-        const ADMIN_PHONES = ["+18607163323", "8607163323", "+1555123456"];
-    
-        const userPhone = localStorage.getItem("userPhoneNumber");
-        const adminButton = document.getElementById("adminPanelButton");
-    
-        if (adminButton && ADMIN_PHONES.includes(userPhone)) {
-            adminButton.style.display = "block";
-        } else if (adminButton) {
-            adminButton.style.display = "none";
+            let html = '';
+            
+            topCardsResult.cards.forEach((card, index) => {
+                const rankLabel = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                
+                html += `
+                    <div class="card-row">
+                        <img src="${card.imageUrl}" alt="${card.cardName}" class="card-image" 
+                             onerror="this.style.display='none'">
+                        <div class="card-info">
+                            <div class="card-name">${rankLabel} ${card.cardName}</div>
+                            <div class="card-bank">${card.issuingBank}</div>
+                        </div>
+                `;
+                
+                if (topCardsResult.hasDualCodes) {
+                    html += `
+                        <div class="dual-rates">
+                            <div class="rate-column">
+                                <div class="rate-heading">${topCardsResult.code1Heading}</div>
+                                <div class="rate-value">${card.rate1}%</div>
+                            </div>
+                            <div class="rate-column">
+                                <div class="rate-heading">${topCardsResult.code2Heading}</div>
+                                <div class="rate-value">${card.rate2 || '0.00'}%</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="rate-display">
+                            <div class="rate-value">${card.rate1}%</div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+            topCardsContainer.style.display = 'block';
+            
+            // Hide the old reward cards image
+            document.getElementById("rewardCards").style.display = "none";
         }
-    }
 
-    // Call this function when menu is opened
-    function toggleMenu() {
-        let menu = document.getElementById("menuDropdown");
-        if (menu.style.display === "block") {
-            menu.style.display = "none";
-        } else {
-            checkAdminAccess(); // Check admin access before showing menu
-            menu.style.display = "block";
+        // Calculate and display top cards
+        function calculateAndDisplayTopCards(merchantName, merchantCode1, merchantCode2 = null) {
+            const userCards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
+            
+            if (userCards.length === 0) {
+                displayTopCards(null, merchantName);
+                return;
+            }
+
+            if (!topCardCalculator) {
+                console.error("Top Card Calculator not initialized");
+                displayTopCards(null, merchantName);
+                return;
+            }
+
+            try {
+                const topCards = topCardCalculator.calculateTopCards(
+                    userCards,
+                    merchantName,
+                    merchantCode1,
+                    merchantCode2,
+                    new Date()
+                );
+
+                const displayResult = topCardCalculator.formatDisplayResult(
+                    topCards,
+                    merchantCode1,
+                    merchantCode2
+                );
+
+                displayTopCards(displayResult, merchantName);
+            } catch (error) {
+                console.error("Error calculating top cards:", error);
+                displayTopCards(null, merchantName);
+            }
         }
-    }
 
+        document.addEventListener("DOMContentLoaded", function() {
+            // Load card database
+            loadCardDatabase();
+            
+            // Check for shared link tracking parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const referrer = urlParams.get('ref');
+            const shareId = urlParams.get('sid');
+        
+            if (referrer && shareId) {
+                logShareVisit(referrer, shareId);
+                // Clean up URL to remove tracking parameters
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        
+            // Existing login state check
+            if (localStorage.getItem("userPhoneNumber")) {
+                document.getElementById("phoneEntry").style.display = "none";
+                document.getElementById("getPlaceButton").style.display = "block";
+                document.getElementById("nearestPlaceHeading").style.display = "block";
+                document.getElementById("output").style.display = "block";
+            }
+        
+            // Initialize vehicle dropdowns immediately when page loads
+            initializeVehicleDropdownsOnLoad();
+        });
+
+        function checkAdminAccess() {
+            // Define multiple admin phone numbers
+            const ADMIN_PHONES = ["+18607163323", "8607163323", "+1555123456"];
+        
+            const userPhone = localStorage.getItem("userPhoneNumber");
+            const adminButton = document.getElementById("adminPanelButton");
+        
+            if (adminButton && ADMIN_PHONES.includes(userPhone)) {
+                adminButton.style.display = "block";
+            } else if (adminButton) {
+                adminButton.style.display = "none";
+            }
+        }
+
+        // Call this function when menu is opened
+        function toggleMenu() {
+            let menu = document.getElementById("menuDropdown");
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                checkAdminAccess(); // Check admin access before showing menu
+                menu.style.display = "block";
+            }
+        }
 
         function initializeVehicleDropdownsOnLoad() {
             // Populate year dropdowns
@@ -423,140 +848,137 @@ checkLocationAndActivate();
             location.reload();
         }
 
+        function registerCreditCards() {
+            const formContainer = document.createElement("div");
+            formContainer.innerHTML = `
+                <div id="cardForm" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; background-color: #f9f9f9; z-index: 9999; overflow-y: auto; padding: 30px 10px 10px 10px; border: 1px solid #ccc; border-radius: 10px;">
 
-function registerCreditCards() {
-    const formContainer = document.createElement("div");
-    formContainer.innerHTML = `
-        <div id="cardForm" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; background-color: #f9f9f9; z-index: 9999; overflow-y: auto; padding: 30px 10px 10px 10px; border: 1px solid #ccc; border-radius: 10px;">
-
-            <h3 style="margin-top: 0;">Card Entry ${localStorage.getItem('registeredCreditCards') ? JSON.parse(localStorage.getItem('registeredCreditCards')).length + 1 : 1} of 5</h3>
-            <label>Bank Name:<br>
-                <input list="bankOptions" type="text" id="bankName" placeholder="Start typing...">
-                <datalist id="bankOptions">
-                    <option value="Chase">
-                    <option value="American Express">
-                    <option value="Capital One">
-                    <option value="Citi">
-                    <option value="Bank of America">
-                    <option value="Wells Fargo">
-                    <option value="Discover">
-                    <option value="Barclays">
-                    <option value="US Bank">
-                    <option value="PNC">
-                </datalist>
-            </label><br><br>
-            <label>Credit Card Program:<br>
-                <input type="text" id="cardProgram" placeholder="Enter Program Name">
-            </label><br><br>
-            <button onclick="submitCardForm()" style="width: 80px; font-size: 13px; padding: 4px 8px; margin: 2px auto 6px auto;">Save</button>
-            <button onclick="closeCardForm()" style="width: 80px; font-size: 13px; padding: 4px 8px; margin: 12px auto 4px auto;">Cancel</button>
-        <div id="savedCardsSummary" style="text-align: left; font-size: 14px; margin-top: 15px;"></div>
-</div>`;
-    document.body.appendChild(formContainer);
-    updateSavedCardsSummary(JSON.parse(localStorage.getItem("registeredCreditCards")) || []);
-}
-
-function submitCardForm() {
-    const bank = document.getElementById("bankName").value;
-    const program = document.getElementById("cardProgram").value;
-
-    if (!bank || !program) {
-        alert("Please fill out all fields.");
-        return;
-    }
-
-    let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
-    if (cards.length >= 5) {
-        alert("Maximum of 5 cards allowed.");
-        return;
-    }
-
-    cards.push({ bank, program });
-    localStorage.setItem("registeredCreditCards", JSON.stringify(cards));
-    updateSavedCardsSummary(cards);
-    alert("Credit Card Saved Successfully");
-    closeCardForm();
-}
-
-
-function updateSavedCardsSummary(cards) {
-    const summaryDiv = document.getElementById("savedCardsSummary");
-    if (!summaryDiv) return;
-    if (!cards || cards.length === 0) {
-        summaryDiv.innerHTML = "";
-        return;
-    }
-    let html = "<strong>Saved Cards:</strong><ul style='padding-left: 0; list-style: none;'>";
-    cards.forEach((card, i) => {
-        html += `<li style='display: flex; justify-content: space-between; align-items: center;'><span>(${i + 1}) ${card.bank} – ${card.program}</span><span style='display: flex; gap: 6px;'><button onclick="editCard(${i})" style='font-size: 11px; padding: 2px 6px;'>Edit</button><button onclick="removeCard(${i})" style='font-size: 11px; padding: 2px 6px;'>Remove</button></span></li>`;
-    });
-    html += "</ul>";
-    summaryDiv.innerHTML = html;
-}
-
-function removeCard(index) {
-    let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
-    cards.splice(index, 1);
-    localStorage.setItem("registeredCreditCards", JSON.stringify(cards));
-    updateSavedCardsSummary(cards);
-}
-
-function editCard(index) {
-    let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
-    const card = cards[index];
-    if (!card) return;
-
-    const form = document.getElementById("cardForm");
-    if (form) form.remove();
-
-    const formContainer = document.createElement("div");
-    formContainer.innerHTML = `
-        <div id="cardForm" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; background-color: #f9f9f9; z-index: 9999; overflow-y: auto; padding: 30px 10px 10px 10px; border: 1px solid #ccc; border-radius: 10px;">
-            <h3 style="margin-top: 0;">Edit Card ${index + 1}</h3>
-            <label>Bank Name:<br>
-                <input list="bankOptions" type="text" id="bankName" value="${card.bank}" placeholder="Start typing...">
-                <datalist id="bankOptions">
-                    <option value="Chase">
-                    <option value="American Express">
-                    <option value="Capital One">
-                    <option value="Citi">
-                    <option value="Bank of America">
-                    <option value="Wells Fargo">
-                    <option value="Discover">
-                    <option value="Barclays">
-                    <option value="US Bank">
-                    <option value="PNC">
-                </datalist>
-            </label><br><br>
-            <label>Credit Card Program:<br>
-                <input type="text" id="cardProgram" value="${card.program}" placeholder="Enter Program Name">
-            </label><br><br>
-            <button onclick="updateCard(${index})" style="width: 80px; font-size: 13px; padding: 2px 6px; margin: 0px auto 6px auto;">Update</button>
-            <button onclick="closeCardForm()" style="width: 80px; font-size: 13px; padding: 2px 6px; margin: 12px auto 4px auto;">Cancel</button>
+                    <h3 style="margin-top: 0;">Card Entry ${localStorage.getItem('registeredCreditCards') ? JSON.parse(localStorage.getItem('registeredCreditCards')).length + 1 : 1} of 5</h3>
+                    <label>Bank Name:<br>
+                        <input list="bankOptions" type="text" id="bankName" placeholder="Start typing...">
+                        <datalist id="bankOptions">
+                            <option value="Chase">
+                            <option value="American Express">
+                            <option value="Capital One">
+                            <option value="Citi">
+                            <option value="Bank of America">
+                            <option value="Wells Fargo">
+                            <option value="Discover">
+                            <option value="Barclays">
+                            <option value="US Bank">
+                            <option value="PNC">
+                        </datalist>
+                    </label><br><br>
+                    <label>Credit Card Program:<br>
+                        <input type="text" id="cardProgram" placeholder="Enter Program Name">
+                    </label><br><br>
+                    <button onclick="submitCardForm()" style="width: 80px; font-size: 13px; padding: 4px 8px; margin: 2px auto 6px auto;">Save</button>
+                    <button onclick="closeCardForm()" style="width: 80px; font-size: 13px; padding: 4px 8px; margin: 12px auto 4px auto;">Cancel</button>
+                <div id="savedCardsSummary" style="text-align: left; font-size: 14px; margin-top: 15px;"></div>
         </div>`;
-    document.body.appendChild(formContainer);
-}
+            document.body.appendChild(formContainer);
+            updateSavedCardsSummary(JSON.parse(localStorage.getItem("registeredCreditCards")) || []);
+        }
 
-function updateCard(index) {
-    let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
-    const bank = document.getElementById("bankName").value;
-    const program = document.getElementById("cardProgram").value;
-    if (!bank || !program) {
-        alert("Please fill out all fields.");
-        return;
-    }
-    cards[index] = { bank, program };
-    localStorage.setItem("registeredCreditCards", JSON.stringify(cards));
-    updateSavedCardsSummary(cards);
-    closeCardForm();
-}
+        function submitCardForm() {
+            const bank = document.getElementById("bankName").value;
+            const program = document.getElementById("cardProgram").value;
 
-function closeCardForm() {
-    const form = document.getElementById("cardForm");
-    if (form) form.remove();
-    document.getElementById("menuDropdown").style.display = "none";
-}
+            if (!bank || !program) {
+                alert("Please fill out all fields.");
+                return;
+            }
 
+            let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
+            if (cards.length >= 5) {
+                alert("Maximum of 5 cards allowed.");
+                return;
+            }
+
+            cards.push({ bank, program });
+            localStorage.setItem("registeredCreditCards", JSON.stringify(cards));
+            updateSavedCardsSummary(cards);
+            alert("Credit Card Saved Successfully");
+            closeCardForm();
+        }
+
+        function updateSavedCardsSummary(cards) {
+            const summaryDiv = document.getElementById("savedCardsSummary");
+            if (!summaryDiv) return;
+            if (!cards || cards.length === 0) {
+                summaryDiv.innerHTML = "";
+                return;
+            }
+            let html = "<strong>Saved Cards:</strong><ul style='padding-left: 0; list-style: none;'>";
+            cards.forEach((card, i) => {
+                html += `<li style='display: flex; justify-content: space-between; align-items: center;'><span>(${i + 1}) ${card.bank} — ${card.program}</span><span style='display: flex; gap: 6px;'><button onclick="editCard(${i})" style='font-size: 11px; padding: 2px 6px;'>Edit</button><button onclick="removeCard(${i})" style='font-size: 11px; padding: 2px 6px;'>Remove</button></span></li>`;
+            });
+            html += "</ul>";
+            summaryDiv.innerHTML = html;
+        }
+
+        function removeCard(index) {
+            let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
+            cards.splice(index, 1);
+            localStorage.setItem("registeredCreditCards", JSON.stringify(cards));
+            updateSavedCardsSummary(cards);
+        }
+
+        function editCard(index) {
+            let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
+            const card = cards[index];
+            if (!card) return;
+
+            const form = document.getElementById("cardForm");
+            if (form) form.remove();
+
+            const formContainer = document.createElement("div");
+            formContainer.innerHTML = `
+                <div id="cardForm" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; background-color: #f9f9f9; z-index: 9999; overflow-y: auto; padding: 30px 10px 10px 10px; border: 1px solid #ccc; border-radius: 10px;">
+                    <h3 style="margin-top: 0;">Edit Card ${index + 1}</h3>
+                    <label>Bank Name:<br>
+                        <input list="bankOptions" type="text" id="bankName" value="${card.bank}" placeholder="Start typing...">
+                        <datalist id="bankOptions">
+                            <option value="Chase">
+                            <option value="American Express">
+                            <option value="Capital One">
+                            <option value="Citi">
+                            <option value="Bank of America">
+                            <option value="Wells Fargo">
+                            <option value="Discover">
+                            <option value="Barclays">
+                            <option value="US Bank">
+                            <option value="PNC">
+                        </datalist>
+                    </label><br><br>
+                    <label>Credit Card Program:<br>
+                        <input type="text" id="cardProgram" value="${card.program}" placeholder="Enter Program Name">
+                    </label><br><br>
+                    <button onclick="updateCard(${index})" style="width: 80px; font-size: 13px; padding: 2px 6px; margin: 0px auto 6px auto;">Update</button>
+                    <button onclick="closeCardForm()" style="width: 80px; font-size: 13px; padding: 2px 6px; margin: 12px auto 4px auto;">Cancel</button>
+                </div>`;
+            document.body.appendChild(formContainer);
+        }
+
+        function updateCard(index) {
+            let cards = JSON.parse(localStorage.getItem("registeredCreditCards")) || [];
+            const bank = document.getElementById("bankName").value;
+            const program = document.getElementById("cardProgram").value;
+            if (!bank || !program) {
+                alert("Please fill out all fields.");
+                return;
+            }
+            cards[index] = { bank, program };
+            localStorage.setItem("registeredCreditCards", JSON.stringify(cards));
+            updateSavedCardsSummary(cards);
+            closeCardForm();
+        }
+
+        function closeCardForm() {
+            const form = document.getElementById("cardForm");
+            if (form) form.remove();
+            document.getElementById("menuDropdown").style.display = "none";
+        }
 
         function getLocation() {
             if (navigator.geolocation) {
@@ -575,7 +997,6 @@ function closeCardForm() {
             }
         }
 
-
 // Category mapping from fsq_category_id to old integer IDs
 const CATEGORY_MAPPING = {
     "4d4b7104d754a06370d81259": 10000, "4bf58dd8d48988d182941735": 10001, "5109983191d435c0d71c2bb1": 10002, "4fceea171983d5d06c3e9823": 10003, "4bf58dd8d48988d1e1931735": 10004, "4bf58dd8d48988d1e2931735": 10005, "63be6904847c3692a84b9b20": 10006, "4bf58dd8d48988d1e4931735": 10007, "63be6904847c3692a84b9b21": 10008, "4bf58dd8d48988d17c941735": 10009, "4bf58dd8d48988d1e5931735": 10010, "63be6904847c3692a84b9b22": 10011, "4bf58dd8d48988d1e6931735": 10012, "4bf58dd8d48988d1e7931735": 10013, "63be6904847c3692a84b9b23": 10014, "4bf58dd8d48988d1e8931735": 10015, "4bf58dd8d48988d1e9931735": 10016, "63be6904847c3692a84b9b24": 10017, "4bf58dd8d48988d1ea931735": 10018, "4bf58dd8d48988d1eb931735": 10019, "63be6904847c3692a84b9b25": 10020, "4bf58dd8d48988d1ed931735": 10021, "4bf58dd8d48988d1ef931735": 10022, "63be6904847c3692a84b9b26": 10023, "4bf58dd8d48988d1f0931735": 10024, "4bf58dd8d48988d1f1931735": 10025, "4bf58dd8d48988d1f2931735": 10026, "4bf58dd8d48988d1f3931735": 10027, "63be6904847c3692a84b9b27": 10028, "4bf58dd8d48988d1f4931735": 10029, "63be6904847c3692a84b9bb5": 13000, "4bf58dd8d48988d179941735": 13001, "4bf58dd8d48988d16a941735": 13002, "4bf58dd8d48988d116941735": 13003, "4bf58dd8d48988d1ea941735": 13004, "52e81612bcbc57f1066b7a0d": 13005, "56aa371ce4b08b9a8d57356c": 13006, "4bf58dd8d48988d117941735": 13007, "52e81612bcbc57f1066b7a0e": 13008, "4bf58dd8d48988d11e941735": 13009, "4bf58dd8d48988d118941735": 13010, "4bf58dd8d48988d1d8941735": 13011, "4bf58dd8d48988d119941735": 13012, "4bf58dd8d48988d1d5941735": 13013, "5f2c40f15b4c177b9a6dc684": 13014, "52e81612bcbc57f1066b7a06": 13015, "4bf58dd8d48988d120941735": 13016, "4bf58dd8d48988d121941735": 13017, "4bf58dd8d48988d1e8931735": 13018, "4bf58dd8d48988d11b941735": 13019, "5f2c224bb6d05514c70440a3": 13020, "4bf58dd8d48988d11c941735": 13021, "4bf58dd8d48988d1d4941735": 13022, "4bf58dd8d48988d11d941735": 13023, "56aa371be4b08b9a8d57354d": 13024, "4bf58dd8d48988d122941735": 13025, "4bf58dd8d48988d123941735": 13026, "4bf58dd8d48988d143941735": 13027, "50327c8591d4c4b30a586d5d": 13028, "63be6904847c3692a84b9bb6": 13029, "52e81612bcbc57f1066b7a0c": 13030, "4bf58dd8d48988d16d941735": 13031, "4bf58dd8d48988d1e0931735": 13032, "56aa371be4b08b9a8d573508": 13033, "4bf58dd8d48988d1dc931735": 13034, "4bf58dd8d48988d128941735": 13035, "5e189fd6eee47d000759bbfd": 13036, "52e81612bcbc57f1066b79f2": 13037, "4bf58dd8d48988d1d0941735": 13038, "4bf58dd8d48988d1bc941735": 13039, "512e7cae91d4cbb4e5efe0af": 13040, "5f2c407c5b4c177b9a6dc536": 13041, "4bf58dd8d48988d1c9941735": 13042, "5744ccdfe4b0c0459246b4e2": 13043, "52e81612bcbc57f1066b7a0a": 13044, "62d5af45da6648532de303ee": 13045, "4e0e22f5a56208c4ea9a85a0": 13046, "4bf58dd8d48988d148941735": 13047, "4bf58dd8d48988d120951735": 13048, "56aa371be4b08b9a8d57350b": 13049, "4bf58dd8d48988d1cb941735": 13050, "4bf58dd8d48988d112941735": 13051, "5e189d71eee47d000759b7e2": 13052, "53e510b7498ebcb1801b55d4": 13053, "4d4b7105d754a06374d81259": 13054, "503288ae91d4c4b30a586d67": 13055, "4bf58dd8d48988d1c8941735": 13056, "4bf58dd8d48988d10a941735": 13057, "5f2c344a5b4c177b9a6dc011": 13058, "4bf58dd8d48988d14e941735": 13059, "4bf58dd8d48988d157941735": 13060, "5f2c2b7db6d05514c7044837": 13061, "4bf58dd8d48988d142941735": 13062, "56aa371be4b08b9a8d573568": 13063, "52e81612bcbc57f1066b7a03": 13064, "4bf58dd8d48988d145941735": 13065, "4d4b7105d754a06378d81259": 17000, "5267e446e4b0ec79466e48c4": 17001, "4bf58dd8d48988d116951735": 17002, "4bf58dd8d48988d127951735": 17003, "63be6904847c3692a84b9be2": 17004, "56aa371be4b08b9a8d5734d3": 17005, "63be6904847c3692a84b9be3": 17006, "4eb1c1623b7b52c0e1adc2ec": 17007, "63be6904847c3692a84b9be4": 17008, "5e8f50bd03c7a9000c1e2fbc": 17009, "63be6904847c3692a84b9be5": 17010, "5e8f501a03c7a9000c1e2e88": 17011, "63be6904847c3692a84b9be6": 17012, "63be6904847c3692a84b9be7": 17013, "63be6904847c3692a84b9be8": 17014, "5032833091d4c4b30a586d60": 17015, "59d79d6b2e268052fa2a3332": 17016, "4bf58dd8d48988d124951735": 17017, "52f2ab2ebcbc57f1066b8b32": 17018, "52f2ab2ebcbc57f1066b8b40": 17019, "52f2ab2ebcbc57f1066b8b42": 17020, "4bf58dd8d48988d1f1941735": 17021, "4bf58dd8d48988d114951735": 17022, "52f2ab2ebcbc57f1066b8b30": 17023, "4bf58dd8d48988d104951735": 17024, "63be6904847c3692a84b9be9": 17025, "52f2ab2ebcbc57f1066b8b18": 17026, "63be6904847c3692a84b9bea": 17027, "4eb1bdf03b7b55596b4a7491": 17028, "4bf58dd8d48988d122951735": 17029, "4f04afc02fb6e1c99f3db0bc": 17030, "4bf58dd8d48988d10b951735": 17031, "5454144b498ec1f095bff2f2": 17032, "4d954b0ea243a5684a65b473": 17033, "4bf58dd8d48988d10c951735": 17034, "52f2ab2ebcbc57f1066b8b17": 17035, "63be6904847c3692a84b9beb": 17036, "4bf58dd8d48988d1f6941735": 17037, "52dea92d3cf9994f4e043dbb": 17038, "5745c2e4498e11e7bccabdbd": 17039, "589ddde98ae3635c072819ee": 17040, "4d954afda243a5684865b473": 17041, "63be6904847c3692a84b9bec": 17042, "56aa371be4b08b9a8d5734cb": 17043, "4bf58dd8d48988d11a951735": 17044, "4bf58dd8d48988d105951735": 17045, "4bf58dd8d48988d103951735": 17046, "4bf58dd8d48988d102951735": 17047, "4bf58dd8d48988d111951735": 17048, "4bf58dd8d48988d109951735": 17049, "4bf58dd8d48988d106951735": 17050, "4bf58dd8d48988d107951735": 17051, "63be6904847c3692a84b9bed": 17052, "63be6904847c3692a84b9bee": 17053, "52f2ab2ebcbc57f1066b8b2e": 17054, "4bf58dd8d48988d108951735": 17055, "503287a291d4c4b30a586d65": 17056, "52f2ab2ebcbc57f1066b8b3a": 17057, "4bf58dd8d48988d1f7941735": 17058, "56aa371be4b08b9a8d573505": 17059, "4bf58dd8d48988d11b951735": 17060, "4bf58dd8d48988d1f9941735": 17061, "5370f356bcbc57f1066c94c2": 17062, "4bf58dd8d48988d11d951735": 17063, "4bf58dd8d48988d117951735": 17064, "4bf58dd8d48988d11e951735": 17065, "52f2ab2ebcbc57f1066b8b31": 17066, "5e18993feee47d000759b256": 17067, "58daa1558bbb0b01f18ec1ca": 17068, "4bf58dd8d48988d1fa941735": 17069, "4bf58dd8d48988d10e951735": 17070, "52f2ab2ebcbc57f1066b8b1c": 17071, "4bf58dd8d48988d1f5941735": 17072, "4bf58dd8d48988d118951735": 17073, "52f2ab2ebcbc57f1066b8b45": 17074, "50aa9e744b90af0d42d5de0e": 17075, "52f2ab2ebcbc57f1066b8b2c": 17076, "5f2c41945b4c177b9a6dc7d6": 17077, "63be6904847c3692a84b9bef": 17078, "58daa1558bbb0b01f18ec1e8": 17079, "4bf58dd8d48988d186941735": 17080, "63be6904847c3692a84b9bf0": 17081, "56aa371be4b08b9a8d573564": 17082, "52f2ab2ebcbc57f1066b8b46": 17083, "58daa1558bbb0b01f18ec1e5": 17084, "4bf58dd8d48988d119951735": 17085, "52f2ab2ebcbc57f1066b8b24": 17086, "4bf58dd8d48988d1f8941735": 17087, "52f2ab2ebcbc57f1066b8b2a": 17088, "63be6904847c3692a84b9bf1": 17089, "63be6904847c3692a84b9bf2": 17090, "58daa1558bbb0b01f18ec1b4": 17091, "55888a5a498e782e3303b43a": 17092, "52f2ab2ebcbc57f1066b8b27": 17093, "4eb1c0253b7b52c0e1adc2e9": 17094, "4bf58dd8d48988d128951735": 17095, "4bf58dd8d48988d112951735": 17096, "4bf58dd8d48988d1fb941735": 17097, "52f2ab2ebcbc57f1066b8b25": 17098, "52f2ab2ebcbc57f1066b8b2b": 17099, "52f2ab2ebcbc57f1066b8b29": 17100, "55077a22498e5e9248869ba2": 19007, "5032872391d4c4b30a586d64": 19008, "4bf58dd8d48988d113951735": 19009, "4bf58dd8d48988d1f6931735": 19010, "63be6904847c3692a84b9c24": 19011, "63be6904847c3692a84b9c25": 19012, "4bf58dd8d48988d1f8931735": 19013, "4f4530a74b9074f6e4fb0100": 19014, "63be6904847c3692a84b9c26": 19015, "4bf58dd8d48988d1ee931735": 19016, "4bf58dd8d48988d1fa931735": 19017, "4bf58dd8d48988d132951735": 19018, "4bf58dd8d48988d1ec931735": 19048
@@ -585,8 +1006,6 @@ const CATEGORY_MAPPING = {
 function mapCategoryId(fsqCategoryId) {
     return CATEGORY_MAPPING[fsqCategoryId] || 0;
 }
-
-
 
 function fetchNearestPlace(lat, lon) {
     // Call serverless function for geotagging candidates
@@ -628,7 +1047,7 @@ function fetchNearestPlace(lat, lon) {
                                (categoryId >= 17000 && categoryId <= 17999) ||
                                (categoryId >= 19008 && categoryId <= 19023) || 
                                (categoryId >= 19025 && categoryId <= 19030) ||
-                               (categoryId >= 19034 && categoryID <= 19071);
+                               (categoryId >= 19034 && categoryId <= 19071);
                     });
                 });
 
@@ -655,9 +1074,8 @@ function fetchNearestPlace(lat, lon) {
                     document.getElementById("nearestPlace").dataset.categoryid = categoryId;
                     document.getElementById("screenIndicator").style.display = "block";
 
-                    let rewardImage = document.getElementById("rewardCards");
-                    rewardImage.src = categoryId % 2 === 1 ? "Top_Cards_1.PNG" : "Top_Cards_2.PNG";
-                    rewardImage.style.display = "block";
+                    // Calculate and display top cards (NEW)
+                    calculateAndDisplayTopCards(nearest.name, categoryId);
 
                     const promo = document.getElementById("insurancePromo");
                     const promoMsg = document.getElementById("promoMessage");
@@ -696,7 +1114,6 @@ function fetchNearestPlace(lat, lon) {
             document.getElementById("nearestPlace").innerText = "Error fetching places. Please check your internet connection and try again.";
         });
 }
-
 
 // Log share events
 function logShareEvent(sharerPhone, shareId) {
@@ -742,7 +1159,6 @@ function shareApp() {
     // Log the share attempt
     logShareEvent(userPhone, shareId);
 }
-
 
 // Show Admin Panel
 function showAdminPanel() {
@@ -850,7 +1266,6 @@ function showAdminPanel() {
     document.body.insertAdjacentHTML('beforeend', adminHTML);
 }
 
-
 // Close Admin Panel
 function closeAdminPanel() {
     const panel = document.getElementById('adminPanel');
@@ -874,7 +1289,6 @@ function clearShareData() {
         alert("Sharing data cleared successfully.");
     }
 }
-
 
     </script>
 
@@ -999,7 +1413,6 @@ function clearShareData() {
 
     <script>
 
-
 function navigateTo(screen) {
     if (screen === 'profileSetup') {
         // Show profile setup screen
@@ -1020,6 +1433,7 @@ function navigateTo(screen) {
         document.getElementById("nearestPlaceHeading").style.display = "none";
         document.getElementById("output").style.display = "none";
         document.getElementById("nearestPlace").style.display = "none";
+        document.getElementById("topCardsContainer").style.display = "none";
         document.getElementById("rewardCards").style.display = "none";
         document.getElementById("insurancePromo").style.display = "none";
         document.getElementById("screenIndicator").style.display = "none";
@@ -1040,6 +1454,7 @@ function navigateTo(screen) {
         document.getElementById("nearestPlaceHeading").style.display = "none";
         document.getElementById("output").style.display = "none";
         document.getElementById("nearestPlace").style.display = "none";
+        document.getElementById("topCardsContainer").style.display = "none";
         document.getElementById("rewardCards").style.display = "none";
         document.getElementById("insurancePromo").style.display = "none";
         document.getElementById('barcodeFollowup').style.display = 'none';
@@ -1052,8 +1467,6 @@ function navigateTo(screen) {
         document.querySelector(".menu").style.display = "block";
     }
 }
-
-
 
         function submitProfile() {
             const state = document.getElementById("stateSelect").value;
@@ -1098,6 +1511,7 @@ function navigateTo(screen) {
             document.getElementById("nearestPlaceHeading").style.display = "none";
             document.getElementById("output").style.display = "none";
             document.getElementById("nearestPlace").style.display = "none";
+            document.getElementById("topCardsContainer").style.display = "none";
             document.getElementById("rewardCards").style.display = "none";
             document.getElementById("insurancePromo").style.display = "none";
             document.getElementById("screenIndicator").style.display = "none";
@@ -1126,6 +1540,7 @@ function navigateTo(screen) {
                 document.getElementById("nearestPlaceHeading").style.display = "block";
                 document.getElementById("output").style.display = "block";
                 document.getElementById("nearestPlace").style.display = "block";
+                document.getElementById("topCardsContainer").style.display = "block";
                 document.getElementById("rewardCards").style.display = "block";
                 document.getElementById("insurancePromo").style.display = "block";
                 document.getElementById("screenIndicator").style.display = "block";
@@ -1195,8 +1610,6 @@ function navigateTo(screen) {
 
     </script>
 
-
-
 <div id="sentinelScreen" style="display: none; text-align: center; padding: 20px;">
   <h1 style="margin-top: -25px; font-size: 20px; margin-bottom: 0px;">Max Benefits</h1>
   <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Protect your card purchases</p>
@@ -1227,7 +1640,7 @@ function navigateTo(screen) {
 </div>
 <script>
 function showSentinelScreen() {
-  document.getElementById("dotTopCard").textContent = "○";
+  document.getElementById("dotTopCard").textContent = "◯";
   document.getElementById("dotTopCard").style.color = "#ccc";
   document.getElementById("dotSentinel").textContent = "●";
   document.getElementById("dotSentinel").style.color = "#0070C0";  
@@ -1239,15 +1652,16 @@ function showSentinelScreen() {
   document.getElementById("nearestPlaceHeading").style.display = "none";
   document.getElementById("output").style.display = "none";
   document.getElementById("nearestPlace").style.display = "none";
+  document.getElementById("topCardsContainer").style.display = "none";
   document.getElementById("rewardCards").style.display = "none";
   document.getElementById("insurancePromo").style.display = "none";
   document.getElementById("maxAlertsScreen").style.display = "none";
 }
 
 function showMaxAlertsScreen() {
-  document.getElementById("dotTopCard").textContent = "○";
+  document.getElementById("dotTopCard").textContent = "◯";
   document.getElementById("dotTopCard").style.color = "#ccc";
-  document.getElementById("dotSentinel").textContent = "○";
+  document.getElementById("dotSentinel").textContent = "◯";
   document.getElementById("dotSentinel").style.color = "#ccc";
   document.getElementById("dotMaxAlerts").textContent = "●";
   document.getElementById("dotMaxAlerts").style.color = "#0070C0";
@@ -1260,6 +1674,7 @@ function showMaxAlertsScreen() {
   document.getElementById("nearestPlaceHeading").style.display = "none";
   document.getElementById("output").style.display = "none";
   document.getElementById("nearestPlace").style.display = "none";
+  document.getElementById("topCardsContainer").style.display = "none";
   document.getElementById("rewardCards").style.display = "none";
   document.getElementById("insurancePromo").style.display = "none";
   loadVehicleRecalls();
@@ -1268,9 +1683,9 @@ function showMaxAlertsScreen() {
 function showMaxRewardsScreen() {
   document.getElementById("dotTopCard").textContent = "●";
   document.getElementById("dotTopCard").style.color = "#0070C0";
-  document.getElementById("dotSentinel").textContent = "○";
+  document.getElementById("dotSentinel").textContent = "◯";
   document.getElementById("dotSentinel").style.color = "#ccc";
-  document.getElementById("dotMaxAlerts").textContent = "○";
+  document.getElementById("dotMaxAlerts").textContent = "◯";
   document.getElementById("dotMaxAlerts").style.color = "#ccc";
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
@@ -1281,6 +1696,7 @@ function showMaxRewardsScreen() {
   document.getElementById("nearestPlaceHeading").style.display = "block";
   document.getElementById("output").style.display = "block";
   document.getElementById("nearestPlace").style.display = "block";
+  document.getElementById("topCardsContainer").style.display = "block";
   document.getElementById("rewardCards").style.display = "block";
   document.getElementById("insurancePromo").style.display = "block";
 }
@@ -1290,7 +1706,6 @@ function handleBenefitsResponse(response) {
     document.getElementById("insurancePromo").style.display = "block";
   }
 }
-
 
 function lookupBarcode(upcOverride) {
    const barcode = upcOverride || document.getElementById("barcodeInput").value;
@@ -1304,21 +1719,7 @@ function lookupBarcode(upcOverride) {
     .then(data => {
       console.log("API response:", data);
       if (!data.products || !data.products.length) {
-        document.getElementById("productInfo").innerHTML = "Product not found";
-        document.getElementById('barcodeFollowup').style.display = 'none';
-        // Clear Max Alerts product info if no product found
-        document.getElementById("maxAlertsProductInfo").innerHTML = "";
-        return;
-      }
-      const product = data.products[0];
-      const image = product.images && product.images.length > 0 ? product.images[0] : "";
-      const info = `
-        <strong>Manufacturer:</strong> ${product.manufacturer || 'N/A'}<br>
-        <strong>Brand:</strong> ${product.brand || 'N/A'}<br>
-        <strong>Model:</strong> ${product.model || 'N/A'}
-        <strong>   Category:</strong> ${product.category || 'N/A'}<br>
-        ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 5px;">` : ""}`;
-      document.getElementById("productInfo").innerHTML = info;
+        document.getElementById("productInfo").innerHTML = info;
       document.getElementById('barcodeFollowup').style.display = 'block';
 
       // Update Max Alerts screen product info
@@ -1373,7 +1774,6 @@ function updateMaxAlertsProductInfo(product, barcode, image) {
   } else {
     recallStatus.innerHTML = `<p style="color: green; font-size: 14px; font-weight: bold; margin: 0 0 20px 0;">No recalls or safety alerts found.</p>`;
   }
-
 
   maxAlertsContainer.innerHTML = "";
   maxAlertsContainer.appendChild(productDisplay);
@@ -1528,7 +1928,6 @@ document.addEventListener('touchend', handleTouchEnd, false);
 
 </script>
 
-
 <div id="maxAlertsScreen" style="display: none; text-align: center; padding: 0px;">
     <h1 style="margin-top: 0px; font-size: 20px; margin-bottom: 0px;">Max Alerts</h1>
     <p style="font-size: 15px; font-style: italic; color: #555; margin-top: 0;">Updates on recalls and safety alerts</p>
@@ -1601,7 +2000,6 @@ document.addEventListener('touchend', handleTouchEnd, false);
                     section.innerHTML = `<div class='recall-heading'><strong>${year} ${make} ${model}</strong></div>
                         <div><strong>${recalls.length} recalls</strong></div>`;
 
-
                     recalls.forEach(r => {
                         const formattedDate = formatDateToMMDDYYYY(r.ReportReceivedDate);
                         section.innerHTML += `
@@ -1625,14 +2023,13 @@ document.addEventListener('touchend', handleTouchEnd, false);
     }
 </script>
 
-
 <div id="swipeHint" style="display: none; position: fixed; top: 50%; right: 10px; transform: translateY(-50%); z-index: 999;">
   <img src="arrow_right_icon.png" alt="Swipe Right" style="width: 40px; height: 40px; opacity: 0.7;">
 </div>
 <div id="screenIndicator" style="position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); display: none; z-index: 999;">
   <span id="dotTopCard" style="font-size: 24px; color: #0070C0;">●</span>
-  <span id="dotSentinel" style="font-size: 24px; color: #ccc;">○</span>
-  <span id="dotMaxAlerts" style="font-size: 24px; color: #ccc;">○</span>
+  <span id="dotSentinel" style="font-size: 24px; color: #ccc;">◯</span>
+  <span id="dotMaxAlerts" style="font-size: 24px; color: #ccc;">◯</span>
 </div>
 </body>
 </html>
