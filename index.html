@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0955pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0347pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -624,7 +624,7 @@ checkLocationAndActivate();
         async function loadCardDatabase() {
             try {
                 // Load from your actual CSV file
-                const response = await fetch('/Layout with Sample Data in CSV UTF8.csv');
+                const response = await fetch('Layout_Sample_Data_in_CSV_UTF8.csv');
                 const csvText = await response.text();
                 
                 const parsedData = Papa.parse(csvText, {
