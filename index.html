@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0347pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0405pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -592,8 +592,8 @@ checkLocationAndActivate();
 
             getColumnHeading(merchantCode) {
                 const code = parseInt(merchantCode);
-                if (code === 19009) return "Fuel Pump";
-                if (code === 19008) return "EV Charge";
+                if (code === 19009) return "Fuel";
+                if (code === 19008) return "EV Chg";
                 return "Store";
             }
 
@@ -670,14 +670,14 @@ checkLocationAndActivate();
             let html = '';
             
             topCardsResult.cards.forEach((card, index) => {
-                const rankLabel = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                const rankLabel = index === 0 ? '1' : index === 1 ? '2' : '3';  // rankLabel not used
                 
                 html += `
                     <div class="card-row">
                         <img src="${card.imageUrl}" alt="${card.cardName}" class="card-image" 
                              onerror="this.style.display='none'">
                         <div class="card-info">
-                            <div class="card-name">${rankLabel} ${card.cardName}</div>
+                            <div class="card-name">${card.cardName}</div>
                             <div class="card-bank">${card.issuingBank}</div>
                         </div>
                 `;
