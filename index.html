@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1007pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1025pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -1429,7 +1429,6 @@ function navigateTo(screen) {
         document.getElementById("output").style.display = "none";
         document.getElementById("nearestPlace").style.display = "none";
         document.getElementById("topCardsContainer").style.display = "none";
-        document.getElementById("rewardCards").style.display = "none";
         document.getElementById("insurancePromo").style.display = "none";
         document.getElementById("screenIndicator").style.display = "none";
 
@@ -1450,7 +1449,6 @@ function navigateTo(screen) {
         document.getElementById("output").style.display = "none";
         document.getElementById("nearestPlace").style.display = "none";
         document.getElementById("topCardsContainer").style.display = "none";
-        document.getElementById("rewardCards").style.display = "none";
         document.getElementById("insurancePromo").style.display = "none";
         document.getElementById('barcodeFollowup').style.display = 'none';
         loadVehicleRecalls();
@@ -1507,7 +1505,6 @@ function navigateTo(screen) {
             document.getElementById("output").style.display = "none";
             document.getElementById("nearestPlace").style.display = "none";
             document.getElementById("topCardsContainer").style.display = "none";
-            document.getElementById("rewardCards").style.display = "none";
             document.getElementById("insurancePromo").style.display = "none";
             document.getElementById("screenIndicator").style.display = "none";
             document.getElementById("sentinelScreen").style.display = "none";
@@ -1536,7 +1533,6 @@ function navigateTo(screen) {
                 document.getElementById("output").style.display = "block";
                 document.getElementById("nearestPlace").style.display = "block";
                 document.getElementById("topCardsContainer").style.display = "block";
-                document.getElementById("rewardCards").style.display = "block";
                 document.getElementById("insurancePromo").style.display = "block";
                 document.getElementById("screenIndicator").style.display = "block";
             } else {
@@ -1648,7 +1644,6 @@ function showSentinelScreen() {
   document.getElementById("output").style.display = "none";
   document.getElementById("nearestPlace").style.display = "none";
   document.getElementById("topCardsContainer").style.display = "none";
-  document.getElementById("rewardCards").style.display = "none";
   document.getElementById("insurancePromo").style.display = "none";
   document.getElementById("maxAlertsScreen").style.display = "none";
 }
@@ -1670,7 +1665,6 @@ function showMaxAlertsScreen() {
   document.getElementById("output").style.display = "none";
   document.getElementById("nearestPlace").style.display = "none";
   document.getElementById("topCardsContainer").style.display = "none";
-  document.getElementById("rewardCards").style.display = "none";
   document.getElementById("insurancePromo").style.display = "none";
   loadVehicleRecalls();
 }
@@ -1692,7 +1686,6 @@ function showMaxRewardsScreen() {
   document.getElementById("output").style.display = "block";
   document.getElementById("nearestPlace").style.display = "block";
   document.getElementById("topCardsContainer").style.display = "block";
-  document.getElementById("rewardCards").style.display = "block";
   document.getElementById("insurancePromo").style.display = "block";
 }
 
