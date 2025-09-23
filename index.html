@@ -297,8 +297,8 @@ checkLocationAndActivate();
             background-color: #f9f9f9;
         }
         .card-image {
-            width: 60px;
-            height: 38px;
+            width: 50px;
+            height: 32px;
             object-fit: contain;
             margin-right: 15px;
             border-radius: 4px;
@@ -309,7 +309,7 @@ checkLocationAndActivate();
         }
         .card-name {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 2px;
         }
         .card-bank {
@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0907pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0930pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -384,9 +384,6 @@ checkLocationAndActivate();
         <div id="topCardsDisplay"></div>
     </div>
     
-    <!-- Keep old image as fallback -->
-    <img id="rewardCards" src="" alt="Reward Cards" style="display: none; width: 100%; max-width: 120px; margin: 20px auto;">
-
     <div id="insurancePromo" style="display: none; margin-top: 40px;">
       <p id="promoMessage" style="font-size: 14px; font-weight: bold; color: #0070C0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;"></p>
       <p id="promoSubMessage" style="font-size: 13px; color: #333; font-style: italic; margin-top: -10px;"></p>
@@ -709,8 +706,6 @@ checkLocationAndActivate();
             container.innerHTML = html;
             topCardsContainer.style.display = 'block';
             
-            // Hide the old reward cards image
-            document.getElementById("rewardCards").style.display = "none";
         }
 
         // Calculate and display top cards
