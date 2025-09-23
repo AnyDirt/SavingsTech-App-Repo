@@ -297,8 +297,8 @@ checkLocationAndActivate();
             background-color: #f9f9f9;
         }
         .card-image {
-            width: 90px;
-            height: 57px;
+            width: 60px;
+            height: 38px;
             object-fit: contain;
             margin-right: 15px;
             border-radius: 4px;
@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0456pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0907pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -1707,6 +1707,7 @@ function handleBenefitsResponse(response) {
   }
 }
 
+
 function lookupBarcode(upcOverride) {
    const barcode = upcOverride || document.getElementById("barcodeInput").value;
    if (barcode.length !== 12) {
@@ -1719,7 +1720,20 @@ function lookupBarcode(upcOverride) {
     .then(data => {
       console.log("API response:", data);
       if (!data.products || !data.products.length) {
-        document.getElementById("productInfo").innerHTML = info;
+        document.getElementById("productInfo").innerHTML = "Product not found";
+        document.getElementById('barcodeFollowup').style.display = 'none';
+        document.getElementById("maxAlertsProductInfo").innerHTML = "";
+        return;
+      }
+      const product = data.products[0];
+      const image = product.images && product.images.length > 0 ? product.images[0] : "";
+      const info = `
+        <strong>Manufacturer:</strong> ${product.manufacturer || 'N/A'}<br>
+        <strong>Brand:</strong> ${product.brand || 'N/A'}<br>
+        <strong>Model:</strong> ${product.model || 'N/A'}
+        <strong>   Category:</strong> ${product.category || 'N/A'}<br>
+        ${image ? `<img src="${image}" alt="Product Image" style="width: 100px; margin-top: 5px;">` : ""}`;
+      document.getElementById("productInfo").innerHTML = info;
       document.getElementById('barcodeFollowup').style.display = 'block';
 
       // Update Max Alerts screen product info
@@ -1733,6 +1747,8 @@ function lookupBarcode(upcOverride) {
       document.getElementById("maxAlertsProductInfo").innerHTML = "";
     });
 }
+
+
 
 function updateMaxAlertsProductInfo(product, barcode, image) {
   const maxAlertsContainer = document.getElementById("maxAlertsProductInfo");
