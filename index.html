@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1014pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1030pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -534,9 +534,10 @@ checkLocationAndActivate();
             }
 
             convertToEffectiveRate(rate, rewardsType, conversionRate) {
-                if (rewardsType === 'cashback') {
+                const rewardsTypeLower = (rewardsType || '').toLowerCase();
+                if (rewardsTypeLower === 'cashback') {
                     return rate;
-                } else if (rewardsType === 'points' || rewardsType === 'miles') {
+                } else if (rewardsTypeLower === 'points' || rewardsTypeLower === 'miles') {
                     return rate * conversionRate;
                 }
                 return rate;
