@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0934pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 1000pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -483,9 +483,10 @@ checkLocationAndActivate();
                 
                 // Default: All Other Purchases
                 if (card.rateAOP && this.isValidDateRange(dateObj, card.startDateAOP, card.endDateAOP)) {
+                    console.log("AOP Debug:", card.rateAOP, card.rewardsType, card.rewardsConvRate); // Added for debugging
                     return this.convertToEffectiveRate(card.rateAOP, card.rewardsType, card.rewardsConvRate);
                 }
-                
+
                 return 0;
             }
 
