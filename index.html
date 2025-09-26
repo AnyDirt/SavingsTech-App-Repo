@@ -376,7 +376,7 @@ checkLocationAndActivate();
     </div>
 
     <button id="getPlaceButton" onclick="getLocation()" style="margin-top: -10px;">Get Merchant</button>
-    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0918pm</p>
+    <p id="output" style="font-size: 14px; display: none;">Press button to get merchant and find your top card for rewards and offers 0934pm</p>
     <p id="nearestPlace" style="margin-top: -5px;"></p>
     
     <!-- Top Cards Display (replaces old reward cards image) -->
@@ -635,7 +635,13 @@ checkLocationAndActivate();
                     console.warn("CSV parsing warnings:", parsedData.errors);
                 }
                 
-                cardDatabase = parsedData.data.filter(card => card.issuingBank && card.cardName);
+                // cardDatabase = parsedData.data.filter(card => card.issuingBank && card.cardName);
+
+                cardDatabase = parsedData.data.filter(card => {
+                    console.log("Card:", card.cardName, "ConvRate:", card.rewardsConvRate, "Type:", typeof card.rewardsConvRate);
+                    return card.issuingBank && card.cardName;
+                });
+
                 topCardCalculator = new TopCardCalculator(cardDatabase);
                 console.log(`Loaded ${cardDatabase.length} cards from database`);
                 
