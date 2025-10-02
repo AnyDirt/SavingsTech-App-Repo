@@ -8,7 +8,7 @@ exports.handler = async (event) => {
 
   const { latitude, longitude, radius } = JSON.parse(event.body);
 
-  // API credentials from environment variables
+  // API credentials
   const apiKey = process.env.VISA_API_KEY;
   const sharedSecret = process.env.VISA_SHARED_SECRET;
   const baseUrl = process.env.VISA_BASE_URL || 'https://sandbox.api.visa.com';
@@ -22,8 +22,7 @@ exports.handler = async (event) => {
     };
   }
 
-  // Construct request for location-based search (using city approx from lat/long; adjust as needed)
-  // Note: For precise geo, use merchantZip or test with known merchants like "Starbucks"
+  // Construct request
   const resourcePath = 'merchantsearch/v1/search';
   const queryString = `apikey=${apiKey}`;
   const currentTime = new Date().toISOString();
@@ -34,18 +33,17 @@ exports.handler = async (event) => {
       messageDateTime: currentTime
     },
     searchAttrList: {
-      // Approximate city from lat/long (hardcode for SF test; in prod, reverse geocode)
-      merchantName: 'Starbucks',  // Fallback/test merchant
+      merchantName: 'Starbucks', // Test with known merchant
       merchantCity: 'San Francisco',
-      merchantCountryCode: 'USA',
-      // Add lat/long if supported: merchantLatitude: latitude.toString(), merchantLongitude: longitude.toString()
+      merchantCountryCode: 'USA'
+      // Note: Lat/long not directly supported; use merchantZip or reverse geocode in prod
     },
     searchOptions: {
       maxRecords: '5',
       matchIndicators: 'true',
       matchScore: 'true'
     }
-  });
+  }, null, 0); // Ensure no extra whitespace in JSON
 
   // Generate X-Pay-Token
   const timestamp = Math.floor(Date.now() / 1000).toString();
@@ -53,9 +51,11 @@ exports.handler = async (event) => {
   const hash = crypto.createHmac('sha256', sharedSecret).update(message).digest('hex');
   const xPayToken = `xv2:${timestamp}:${hash}`;
 
+  // Debug logs
   console.log('Request URL:', `${baseUrl}/${resourcePath}?${queryString}`);
-  console.log('X-Pay-Token (first 20 chars):', xPayToken.substring(0, 20) + '...');
-  console.log('Request Body Preview:', JSON.stringify(requestBody).substring(0, 200) + '...');
+  console.log('X-Pay-Token:', xPayToken);
+  console.log('Message String:', message);
+  console.log('Request Body:', requestBody);
 
   try {
     const response = await fetch(`${baseUrl}/${resourcePath}?${queryString}`, {
@@ -63,12 +63,12 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'X-PAY-TOKEN': xPayToken,
+        'X-PAY-TOKEN': xPayToken
       },
-      body: requestBody,
+      body: requestBody
     });
 
-    const responseText = await response.text();  // Get raw text for logging
+    const responseText = await response.text();
     console.log('Visa Response Status:', response.status);
     console.log('Visa Response Body:', responseText);
 
@@ -77,7 +77,6 @@ exports.handler = async (event) => {
     }
 
     const data = JSON.parse(responseText);
-    // Adjust based on actual response: often { merchants: [...] } or { response: { searchResultRecords: [...] } }
     const merchants = data.merchants || data.searchResultRecords || data.response?.searchResultRecords || [];
 
     return {
