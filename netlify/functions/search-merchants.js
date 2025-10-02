@@ -3,7 +3,11 @@ const crypto = require('crypto');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method not allowed' };
+    return {
+      statusCode: 405,
+      headers: { 'Access-Control-Allow-Origin': '*', 'X-Content-Type-Options': 'nosniff' },
+      body: 'Method not allowed'
+    };
   }
 
   const { latitude, longitude, radius } = JSON.parse(event.body);
@@ -17,33 +21,33 @@ exports.handler = async (event) => {
     console.error('Missing credentials:', { hasApiKey: !!apiKey, hasSharedSecret: !!sharedSecret });
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Access-Control-Allow-Origin': '*', 'X-Content-Type-Options': 'nosniff' },
       body: JSON.stringify({ error: 'Missing API credentials' })
     };
   }
 
-  // Construct request
-  const resourcePath = 'merchantsearch/v1/search';
+  // Construct request per Visa Merchant Search API spec
+  const resourcePath = 'merchantsearch/v1/locator';
   const queryString = `apikey=${apiKey}`;
   const currentTime = new Date().toISOString();
   const requestBody = JSON.stringify({
     header: {
-      startIndex: '0',
-      requestMessageId: Date.now().toString(),
-      messageDateTime: currentTime
-    },
-    searchAttrList: {
-      merchantName: 'Starbucks', // Test with known merchant
-      merchantCity: 'San Francisco',
-      merchantCountryCode: 'USA'
-      // Note: Lat/long not directly supported; use merchantZip or reverse geocode in prod
+      messageDateTime: currentTime,
+      requestMessageId: Date.now().toString()
     },
     searchOptions: {
-      maxRecords: '5',
-      matchIndicators: 'true',
-      matchScore: 'true'
-    }
-  }, null, 0); // Ensure no extra whitespace in JSON
+      matchScore: "true",
+      maxRecords: "5",
+      matchIndicators: "true"
+    },
+    searchAttrList: {
+      latitude: latitude,
+      longitude: longitude,
+      distance: Math.ceil(radius / 1609.34).toString(), // Convert meters to miles, as string
+      distanceUnit: "m" // "m" for miles; use "k" for km if preferred
+    },
+    responseAttrList: ["GNLOCATOR"]
+  }, null, 0); // No whitespace
 
   // Generate X-Pay-Token
   const timestamp = Math.floor(Date.now() / 1000).toString();
@@ -71,24 +75,50 @@ exports.handler = async (event) => {
     const responseText = await response.text();
     console.log('Visa Response Status:', response.status);
     console.log('Visa Response Body:', responseText);
+    console.log('Visa Response Headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       throw new Error(`Visa API error: ${response.status} - ${responseText}`);
     }
 
     const data = JSON.parse(responseText);
-    const merchants = data.merchants || data.searchResultRecords || data.response?.searchResultRecords || [];
+    if (data.responseStatus?.code !== 'API000') {
+      throw new Error(`Visa API status error: ${data.responseStatus.code} - ${data.responseStatus.message}`);
+    }
+
+    // Parse merchants per API spec
+    const apiResponse = data.responseData?.response || [];
+    const merchants = apiResponse.map(item => {
+      const values = item.responseValues || {};
+      return {
+        merchantName: values.visaMerchantName || values.merchantName || 'Unknown',
+        address: {
+          line1: values.merchantStreetAddress || '',
+          city: values.merchantCity || '',
+          country: values.merchantCountryCode || '',
+          postalCode: values.merchantPostalCode || ''
+        },
+        distance: parseFloat((values.distance || '0').replace(/ mi$/, '')) || 0,
+        phoneNumber: values.merchantPhoneNumber || 'N/A',
+        latitude: parseFloat(values.locationAddressLatitude) || 0,
+        longitude: parseFloat(values.locationAddressLongitude) || 0
+      };
+    }).sort((a, b) => a.distance - b.distance); // Ensure sorted by distance
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'X-Content-Type-Options': 'nosniff'
+      },
       body: JSON.stringify({ merchants })
     };
   } catch (error) {
     console.error('Full Error:', error.message);
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Access-Control-Allow-Origin': '*', 'X-Content-Type-Options': 'nosniff' },
       body: JSON.stringify({ error: error.message })
     };
   }

@@ -98,17 +98,19 @@
       return R * c;
     }
 
+
     function displayResult(merchant) {
       status.innerHTML = '';
       result.innerHTML = `
-        <h3>Closest Merchant: ${merchant.merchantName || merchant.name}</h3>
-        <p><strong>Address:</strong> ${merchant.address.line1 || ''} ${merchant.address.line2 || ''}<br>
-        ${merchant.address.city || ''}, ${merchant.address.country || ''}</p>
-        <p><strong>Distance:</strong> ${(merchant.distance || 0).toFixed(2)} km</p>
-        <p><strong>Phone:</strong> ${merchant.phoneNumber || 'N/A'}</p>
+        <h3>Closest Merchant: ${merchant.merchantName}</h3>
+        <p><strong>Address:</strong> ${merchant.address.line1}<br>
+        ${merchant.address.city}, ${merchant.address.country} ${merchant.address.postalCode}</p>
+        <p><strong>Distance:</strong> ${merchant.distance.toFixed(2)} mi</p>
+        <p><strong>Phone:</strong> ${merchant.phoneNumber}</p>
       `;
       result.style.display = 'block';
     }
+
 
     function showError(msg) {
       status.innerHTML = `<p class="error">${msg}</p>`;
