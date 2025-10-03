@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     };
   }
 
-  // Construct request per Visa Merchant Search API spec
+  // Construct request
   const resourcePath = 'merchantsearch/v1/locator';
   const queryString = `apikey=${apiKey}`;
   const currentTime = new Date().toISOString();
@@ -41,13 +41,13 @@ exports.handler = async (event) => {
       matchIndicators: "true"
     },
     searchAttrList: {
-      latitude: latitude,
-      longitude: longitude,
-      distance: Math.ceil(radius / 1609.34).toString(), // Convert meters to miles, as string
-      distanceUnit: "m" // "m" for miles; use "k" for km if preferred
+      latitude: latitude || 41.9639, // Fallback to your payload
+      longitude: longitude || -72.7998,
+      distance: Math.ceil((radius || 5000) / 1609.34).toString(), // Meters to miles
+      distanceUnit: "m"
     },
     responseAttrList: ["GNLOCATOR"]
-  }, null, 0); // No whitespace
+  }, null, 0);
 
   // Generate X-Pay-Token
   const timestamp = Math.floor(Date.now() / 1000).toString();
@@ -56,10 +56,14 @@ exports.handler = async (event) => {
   const xPayToken = `xv2:${timestamp}:${hash}`;
 
   // Debug logs
-  console.log('Request URL:', `${baseUrl}/${resourcePath}?${queryString}`);
-  console.log('X-Pay-Token:', xPayToken);
-  console.log('Message String:', message);
+  console.log('API Key (first 5 chars):', apiKey.substring(0, 5));
+  console.log('Shared Secret (first 5 chars):', sharedSecret.substring(0, 5));
+  console.log('Timestamp:', timestamp);
+  console.log('Resource Path:', resourcePath);
+  console.log('Query String:', queryString);
   console.log('Request Body:', requestBody);
+  console.log('Message String:', message);
+  console.log('X-Pay-Token:', xPayToken);
 
   try {
     const response = await fetch(`${baseUrl}/${resourcePath}?${queryString}`, {
@@ -78,15 +82,22 @@ exports.handler = async (event) => {
     console.log('Visa Response Headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
-      throw new Error(`Visa API error: ${response.status} - ${responseText}`);
+      return {
+        statusCode: response.status, // Pass Visa's status (e.g., 401)
+        headers: { 'Access-Control-Allow-Origin': '*', 'X-Content-Type-Options': 'nosniff' },
+        body: JSON.stringify({ error: `Visa API error: ${response.status} - ${responseText}` })
+      };
     }
 
     const data = JSON.parse(responseText);
     if (data.responseStatus?.code !== 'API000') {
-      throw new Error(`Visa API status error: ${data.responseStatus.code} - ${data.responseStatus.message}`);
+      return {
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*', 'X-Content-Type-Options': 'nosniff' },
+        body: JSON.stringify({ error: `Visa API status error: ${data.responseStatus.code} - ${data.responseStatus.message}` })
+      };
     }
 
-    // Parse merchants per API spec
     const apiResponse = data.responseData?.response || [];
     const merchants = apiResponse.map(item => {
       const values = item.responseValues || {};
@@ -103,7 +114,7 @@ exports.handler = async (event) => {
         latitude: parseFloat(values.locationAddressLatitude) || 0,
         longitude: parseFloat(values.locationAddressLongitude) || 0
       };
-    }).sort((a, b) => a.distance - b.distance); // Ensure sorted by distance
+    }).sort((a, b) => a.distance - b.distance);
 
     return {
       statusCode: 200,
