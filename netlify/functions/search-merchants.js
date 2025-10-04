@@ -27,7 +27,7 @@ exports.handler = async (event) => {
   }
 
   // Construct request
-  const resourcePath = 'merchantsearch/v1/locator';
+  const resourcePath = '/merchantsearch/v1/locator';
   const queryString = `apikey=${apiKey}`;
   const currentTime = new Date().toISOString();
   const requestBody = JSON.stringify({

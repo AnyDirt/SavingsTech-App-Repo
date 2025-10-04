@@ -1,0 +1,54 @@
+API Key: 8QUJIXF7J47L21FOQP9321IauyBDW7PjMrGRpMz-mpgbNGJK0
+Shared Secret (first 5 chars): }D0q6
+Timestamp: 1759458510
+Resource Path: merchantsearch/v1/locator
+Query String: apikey=8QUJIXF7J47L21FOQP9321IauyBDW7PjMrGRpMz-mpgbNGJK0
+Request Body: {"header":{"messageDateTime":"2025-10-03T02:28:30.000Z","requestMessageId":"1759458510"},"searchOptions":{"matchScore":"true","maxRecords":"5","matchIndicators":"true"},"searchAttrList":{"latitude":37.7749,"longitude":-122.4194,"distance":"4","distanceUnit":"m"},"responseAttrList":["GNLOCATOR"]}
+Message String: 1759458510merchantsearch/v1/locatorapikey=8QUJIXF7J47L21FOQP9321IauyBDW7PjMrGRpMz-mpgbNGJK0{"header":{"messageDateTime":"2025-10-03T02:28:30.000Z","requestMessageId":"1759458510"},"searchOptions":{"matchScore":"true","maxRecords":"5","matchIndicators":"true"},"searchAttrList":{"latitude":37.7749,"longitude":-122.4194,"distance":"4","distanceUnit":"m"},"responseAttrList":["GNLOCATOR"]}
+X-Pay-Token: xv2:1759458510:bfd1ecbb16bae78f05df6699b87e38eab9c1572d57020ddc99dcbba1e739f4ac
+Note: Unnecessary use of -X or --request, POST is already inferred.
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host sandbox.api.visa.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 198.241.195.228
+*   Trying 198.241.195.228:443...
+* schannel: disabled automatic use of client certificate
+* Connected to sandbox.api.visa.com (198.241.195.228) port 443
+* using HTTP/1.x
+> POST /merchantsearch/v1/locator?apikey=8QUJIXF7J47L21FOQP9321IauyBDW7PjMrGRpMz-mpgbNGJK0 HTTP/1.1
+> Host: sandbox.api.visa.com
+> User-Agent: curl/8.12.1
+> Content-Type: application/json
+> Accept: application/json
+> X-PAY-TOKEN: xv2:1759458510:bfd1ecbb16bae78f05df6699b87e38eab9c1572d57020ddc99dcbba1e739f4ac
+> Content-Length: 296
+> 
+} [296 bytes data]
+* upload completely sent off: 296 bytes
+< HTTP/1.1 401 
+< Server: nginx
+< Date: Fri, 03 Oct 2025 02:28:31 GMT
+< Content-Type: application/json
+< Content-Length: 112
+< Connection: keep-alive
+< X-SERVED-BY: f55b87c75-9
+< X-CORRELATION-ID: 1759458511_076_2094666310_f55b87c75-9_VDP_WS
+< x-vdp-normalized-url: /merchantsearch/v1/locator
+< X-APP-STATUS: 401
+< x-vdp-authn-api-visa-id: MS.102
+< X-ERROR-ORIGIN: 9100
+< X-Frame-Options: SAMEORIGIN
+< X-XSS-Protection: 0
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000;includeSubdomains
+< Cache-Control: no-cache, no-store, must-revalidate
+< Pragma: no-cache
+< Expires: -1
+< Content-Security-Policy-Report-Only: default-src 'self' https://*.v.me https://*.visa.com;script-src 'self' 'unsafe-inline' 'unsafe-eval'  https://*.visa.com https://*.v.me;img-src 'self' https://*.v.me https://*.visa.com https://*.unica.com https://ad.doubleclick.net;style-src 'self' 'unsafe-inline' https://*.visa.com;object-src  https://*.v.me https://*.visa.com data:;report-uri /logging/logCSPReport;
+< X-Content-Security-Policy-Report-Only: default-src 'self' https://*.v.me https://*.visa.com;script-src 'self' 'unsafe-inline' 'unsafe-eval'  https://*.visa.com https://*.v.me;img-src 'self' https://*.v.me https://*.visa.com https://*.unica.com https://ad.doubleclick.net;style-src 'self' 'unsafe-inline' https://*.visa.com;object-src  https://*.v.me https://*.visa.com data:;report-uri /logging/logCSPReport;
+< X-WebKit-CSP-Report-Only: default-src 'self' https://*.v.me https://*.visa.com;script-src 'self' 'unsafe-inline' 'unsafe-eval'  https://*.visa.com https://*.v.me;img-src 'self' https://*.v.me https://*.visa.com https://*.unica.com https://ad.doubleclick.net;style-src 'self' 'unsafe-inline' https://*.visa.com;object-src  https://*.v.me https://*.visa.com data:;report-uri /logging/logCSPReport;
+< 
+{ [112 bytes data]
+100   408  100   112  100   296    493   1304 --:--:-- --:--:-- --:--:--  1805{"responseStatus":{"status":401,"code":"9159","severity":"ERROR","message":"Token Validation Failed","info":""}}
+* Connection #0 to host sandbox.api.visa.com left intact
