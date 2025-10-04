@@ -13,8 +13,8 @@ exports.handler = async (event) => {
   const { latitude, longitude, radius } = JSON.parse(event.body);
 
   // Two-Way SSL requires certificates
-  const cert = process.env.VISA_CERT; // PEM certificate content
-  const key = process.env.VISA_KEY;   // PEM private key content
+  const cert = Buffer.from(process.env.VISA_CERT, 'base64').toString('utf-8');  // PEM certificate content
+  const key = Buffer.from(process.env.VISA_KEY, 'base64').toString('utf-8');    // PEM private key content
   const userId = process.env.VISA_USER_ID;
   const password = process.env.VISA_PASSWORD;
 
