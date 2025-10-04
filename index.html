@@ -65,7 +65,7 @@
         const response = await fetch('/.netlify/functions/search-merchants', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude: lat, longitude: lng, radius: 5000 })
+          body: JSON.stringify({ latitude: lat, longitude: lng, radius: 15000 })
         });
         const data = await response.json();
         if (!response.ok || data.error) {
