@@ -66,7 +66,7 @@ exports.handler = async (event) => {
   console.log('X-Pay-Token:', xPayToken);
 
   try {
-    const response = await fetch(`${baseUrl}/${resourcePath}?${queryString}`, {
+    const response = await fetch(`${baseUrl}${resourcePath}?${queryString}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
