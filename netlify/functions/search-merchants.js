@@ -1,5 +1,6 @@
 const https = require('https');
 const fs = require('fs');
+const path = require('path');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -12,9 +13,9 @@ exports.handler = async (event) => {
 
   const { latitude, longitude, radius } = JSON.parse(event.body);
 
-  // Two-Way SSL requires certificates
-  const cert = Buffer.from(process.env.VISA_CERT, 'base64').toString('utf-8');  // PEM certificate content
-  const key = Buffer.from(process.env.VISA_KEY, 'base64').toString('utf-8');    // PEM private key content
+  // Read certificates from files
+  const cert = fs.readFileSync(path.join(__dirname, 'certs', 'cert.pem'), 'utf-8');
+  const key = fs.readFileSync(path.join(__dirname, 'certs', 'key.pem'), 'utf-8');
   const userId = process.env.VISA_USER_ID;
   const password = process.env.VISA_PASSWORD;
 
