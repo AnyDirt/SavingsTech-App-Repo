@@ -24,7 +24,7 @@ exports.handler = async (event) => {
 
   const requestBody = JSON.stringify({
     header: {
-      messageDateTime: new Date().toISOString(),
+      messageDateTime: new Date().toISOString().slice(0, 23),
       requestMessageId: Date.now().toString()
     },
     searchOptions: {
