@@ -19,8 +19,6 @@ exports.handler = async (event) => {
   // Decode certificates
   const cert = Buffer.from(CERT_BASE64, 'base64').toString('utf-8');
   const key = Buffer.from(KEY_BASE64, 'base64').toString('utf-8');
-  const userId = process.env.VISA_USER_ID;
-  const password = process.env.VISA_PASSWORD;
 
   const requestBody = JSON.stringify({
     header: {
@@ -53,7 +51,6 @@ exports.handler = async (event) => {
     },
     cert: cert,
     key: key,
-    auth: `${userId}:${password}`
   };
 
   return new Promise((resolve) => {
