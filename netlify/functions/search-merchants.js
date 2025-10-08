@@ -37,8 +37,8 @@ exports.handler = async (event) => {
       longitude: longitude || -122.4194,
       distance: Math.ceil((radius || 30) / 1609.34).toString(),
       distanceUnit: "m",
-      lastTranDateRange: "IN LAST 30 DAYS",
-      // paymentAcceptanceMethod: ["F2F"]
+      // lastTranDateRange: "IN LAST 30 DAYS",
+      paymentAcceptanceMethod: ["F2F"]
     },
     responseAttrList: ["GNLOCATOR"]
   });
