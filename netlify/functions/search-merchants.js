@@ -35,7 +35,7 @@ exports.handler = async (event) => {
     searchAttrList: {
       latitude: latitude || 37.7749,
       longitude: longitude || -122.4194,
-      distance: Math.ceil((radius || 100) / 1609.34).toString(),
+      distance: Math.ceil((radius || 60) / 1609.34).toString(),
       distanceUnit: "m"
     },
     responseAttrList: ["GNLOCATOR"]
