@@ -76,15 +76,22 @@ exports.handler = async (event) => {
 
         const parsed = JSON.parse(data);
         const apiResponse = parsed.responseData?.response || [];
+
         const merchants = apiResponse.map(item => {
           const values = item.responseValues || {};
+  
+          // Helper function to clean text
+          const cleanText = (text) => {
+            if (!text) return '';
+            return text.replace(/\\\//g, '/').replace(/&amp;/g, '&');
+          };
+  
           return {
-            merchantName: values.visaMerchantName || 'Unknown',
+            merchantName: cleanText(values.visaStoreName || 'Unknown'),
             address: {
-              line1: values.merchantStreetAddress || '',
-              city: values.merchantCity || '',
-              country: values.merchantCountryCode || '',
-              postalCode: values.merchantPostalCode || ''
+              line1: cleanText(values.merchantStreetAddress || ''),
+              categoryGroup: cleanText(values.primaryMerchantCategoryGroup || ''),
+              categoryDesc: values.merchantCategoryCodeDesc ? cleanText(values.merchantCategoryCodeDesc.join(', ')) : ''
             },
             distance: parseFloat((values.distance || '0').replace(/ mi$/, '')) || 0,
             phoneNumber: values.merchantPhoneNumber || 'N/A',

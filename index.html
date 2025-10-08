@@ -15,7 +15,7 @@
 </head>
 <body>
   <h1>Find Nearby Visa Merchants</h1>
-  <p>Click below to use your phone's location 0623pm.</p>
+  <p>Click below to use your phone's location 0708pm.</p>
   <button id="locateBtn">Get My Location & Search</button>
   <div id="status"></div>
   <div id="result"></div>
@@ -111,8 +111,8 @@
         nearest5.map((merchant, index) => `
           <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
             <h4 style="margin: 5px 0;">${index + 1}. ${merchant.merchantName}</h4>
-            <p style="margin: 5px 0;"><strong>Address:</strong> ${merchant.address.line1}<br>
-            ${merchant.address.city}, ${merchant.address.country} ${merchant.address.postalCode}</p>
+            <p style="margin: 5px 0;"><strong>Address:</strong> ${merchant.address.line1}</p>
+            <p style="margin: 5px 0;"><strong>Category:</strong> ${merchant.address.categoryGroup}${merchant.address.categoryDesc ? ' -- ' + merchant.address.categoryDesc : ''}</p>
             <p style="margin: 5px 0;"><strong>Distance:</strong> ${merchant.distance.toFixed(2)} mi</p>
             <p style="margin: 5px 0;"><strong>Phone:</strong> ${merchant.phoneNumber}</p>
           </div>
