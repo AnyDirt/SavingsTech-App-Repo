@@ -29,14 +29,16 @@ exports.handler = async (event) => {
     },
     searchOptions: {
       matchScore: "true",
-      maxRecords: "5",
+      maxRecords: "10",
       matchIndicators: "true"
     },
     searchAttrList: {
       latitude: latitude || 37.7749,
       longitude: longitude || -122.4194,
-      distance: Math.ceil((radius || 60) / 1609.34).toString(),
-      distanceUnit: "m"
+      distance: Math.ceil((radius || 30) / 1609.34).toString(),
+      distanceUnit: "m",
+      lastTranDateRange: "IN LAST 90 DAYS",
+      paymentAcceptanceMethod: "F2F"
     },
     responseAttrList: ["GNLOCATOR"]
   });

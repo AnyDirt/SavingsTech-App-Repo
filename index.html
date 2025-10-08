@@ -15,7 +15,7 @@
 </head>
 <body>
   <h1>Find Nearby Visa Merchants</h1>
-  <p>Click below to use your phone's location 0855am.</p>
+  <p>Click below to use your phone's location 0532pm.</p>
   <button id="locateBtn">Get My Location & Search</button>
   <div id="status"></div>
   <div id="result"></div>
@@ -65,7 +65,7 @@
         const response = await fetch('/.netlify/functions/search-merchants', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude: lat, longitude: lng, radius: 60 })
+          body: JSON.stringify({ latitude: lat, longitude: lng, radius: 30 })
         });
         const data = await response.json();
         if (!response.ok || data.error) {
@@ -74,14 +74,14 @@
         if (!data.merchants || data.merchants.length === 0) {
           throw new Error('No merchants found within 60 meters. Try increasing search radius.');
         }
-        const closest = data.merchants[0];
-        displayResult(closest);
+
+        displayResult(data.merchants);
+
       } catch (err) {
         console.error('Detailed Error:', err);
         showError(`Failed to fetch merchants: ${err.message}`);
       }
     }
-
 
     function findClosestMerchant(merchants, userLat, userLng) { // Haversine if API doesn't sort
       return merchants.reduce((closest, merchant) => {
@@ -102,15 +102,22 @@
     }
 
 
-    function displayResult(merchant) {
+    function displayResult(merchants) {
       status.innerHTML = '';
-      result.innerHTML = `
-        <h3>Closest Merchant: ${merchant.merchantName}</h3>
-        <p><strong>Address:</strong> ${merchant.address.line1}<br>
-        ${merchant.address.city}, ${merchant.address.country} ${merchant.address.postalCode}</p>
-        <p><strong>Distance:</strong> ${merchant.distance.toFixed(2)} mi</p>
-        <p><strong>Phone:</strong> ${merchant.phoneNumber}</p>
-      `;
+  
+      const nearest5 = merchants.slice(0, 5);
+  
+      result.innerHTML = '<h3>5 Nearest Merchants:</h3>' + 
+        nearest5.map((merchant, index) => `
+          <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
+            <h4 style="margin: 5px 0;">${index + 1}. ${merchant.merchantName}</h4>
+            <p style="margin: 5px 0;"><strong>Address:</strong> ${merchant.address.line1}<br>
+            ${merchant.address.city}, ${merchant.address.country} ${merchant.address.postalCode}</p>
+            <p style="margin: 5px 0;"><strong>Distance:</strong> ${merchant.distance.toFixed(2)} mi</p>
+            <p style="margin: 5px 0;"><strong>Phone:</strong> ${merchant.phoneNumber}</p>
+          </div>
+        `).join('');
+  
       result.style.display = 'block';
     }
 
