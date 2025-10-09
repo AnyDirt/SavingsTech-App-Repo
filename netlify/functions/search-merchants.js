@@ -37,7 +37,7 @@ exports.handler = async (event) => {
       longitude: longitude || -122.4194,
       distance: Math.ceil((radius || 20) / 1609.34).toString(),
       distanceUnit: "m",
-      // lastTranDateRange: "IN LAST 30 DAYS",
+      lastTranDateRange: "IN LAST 30 DAYS",
       paymentAcceptanceMethod: ["F2F"],
       merchantCategoryCode: [
         "5013", "5200", "5251", "5261", "5300", "5310", "5311", "5331", "5411",
