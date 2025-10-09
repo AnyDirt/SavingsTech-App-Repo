@@ -35,7 +35,7 @@ exports.handler = async (event) => {
     searchAttrList: {
       latitude: latitude || 37.7749,
       longitude: longitude || -122.4194,
-      distance: Math.ceil((radius || 30) / 1609.34).toString(),
+      distance: Math.ceil((radius || 20) / 1609.34).toString(),
       distanceUnit: "m",
       // lastTranDateRange: "IN LAST 30 DAYS",
       paymentAcceptanceMethod: ["F2F"],
