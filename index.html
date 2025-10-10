@@ -59,10 +59,9 @@
       showError(msg);
     }
 
-
     async function searchMerchants(lat, lng) {
       try {
-        const response = await fetch('/.netlify/functions/search-merchants', {
+        const response = await fetch('https://savingstech.netlify.app/.netlify/functions/search-merchants', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ latitude: lat, longitude: lng, radius: 20 })
@@ -114,7 +113,6 @@
             <p style="margin: 5px 0;"><strong>Address:</strong> ${merchant.address.line1}</p>
             <p style="margin: 5px 0;"><strong>Category:</strong> ${merchant.address.categoryGroup}${merchant.address.categoryDesc ? ' -- ' + merchant.address.categoryDesc : ''}</p>
             <p style="margin: 5px 0;"><strong>Distance:</strong> ${merchant.distance.toFixed(2)} mi</p>
-            <p style="margin: 5px 0;"><strong>Phone:</strong> ${merchant.phoneNumber}</p>
           </div>
         `).join('');
   
