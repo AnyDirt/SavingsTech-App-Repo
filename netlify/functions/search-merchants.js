@@ -85,15 +85,24 @@ exports.handler = async (event) => {
         const parsed = JSON.parse(data);
         const apiResponse = parsed.responseData?.response || [];
 
+
         const merchants = apiResponse.map(item => {
           const values = item.responseValues || {};
-  
+
           // Helper function to clean text
           const cleanText = (text) => {
             if (!text) return '';
             return text.replace(/\\\//g, '/').replace(/&amp;/g, '&');
           };
   
+          const mccArray = values.merchantCategoryCode || [];
+          let distance = parseFloat((values.distance || '0').replace(/ mi$/, '')) || 0;
+  
+          // Adjust distance for gas stations (pumps in parking lot)
+          if (mccArray.includes('5542') || mccArray.includes('5541')) {
+            distance = Math.max(0, distance - 0.025);
+          }
+
           return {
             merchantName: cleanText(values.visaStoreName || 'Unknown'),
             address: {
@@ -101,11 +110,25 @@ exports.handler = async (event) => {
               categoryGroup: cleanText(values.primaryMerchantCategoryGroup || ''),
               categoryDesc: values.merchantCategoryCodeDesc ? cleanText(values.merchantCategoryCodeDesc.join(', ')) : ''
             },
-            distance: parseFloat((values.distance || '0').replace(/ mi$/, '')) || 0,
-            phoneNumber: values.merchantPhoneNumber || 'N/A',
+            distance: distance,
             latitude: parseFloat(values.locationAddressLatitude) || 0,
-            longitude: parseFloat(values.locationAddressLongitude) || 0
+            longitude: parseFloat(values.locationAddressLongitude) || 0,
+            lastTranDateRange: values.lastTranDateRange || '',
+            streetAddress: cleanText(values.merchantStreetAddress || '')
           };
+        }).filter(merchant => {
+          // Exclude apartments
+          if (merchant.streetAddress.toUpperCase().includes(' APT')) {
+            return false;
+          }
+  
+          // Only include recent activity (last 30 days or empty)
+          const lastTran = merchant.lastTranDateRange;
+          if (lastTran !== '' && lastTran !== 'IN LAST 30 DAYS') {
+            return false;
+          }
+  
+          return true;
         }).sort((a, b) => a.distance - b.distance);
 
         resolve({
