@@ -83,8 +83,9 @@ exports.handler = async (event) => {
         }
 
         const parsed = JSON.parse(data);
+        console.log('API Response Header:', JSON.stringify(parsed.responseData?.header));
+        console.log('Number of merchants returned:', parsed.responseData?.response?.length);
         const apiResponse = parsed.responseData?.response || [];
-
 
         const merchants = apiResponse.map(item => {
           const values = item.responseValues || {};
@@ -144,6 +145,7 @@ exports.handler = async (event) => {
 
     req.on('error', (error) => {
       console.error('Error:', error);
+      console.log('Filtered merchants being sent:', JSON.stringify(merchants));
       resolve({
         statusCode: 500,
         headers: { 'Access-Control-Allow-Origin': '*' },
