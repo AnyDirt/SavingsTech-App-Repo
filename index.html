@@ -15,7 +15,7 @@
 </head>
 <body>
   <h1>Find Nearby Visa Merchants</h1>
-  <p>Click below to use your phone's location sun0946pm.</p>
+  <p>Click below to use your phone's location mon11:16am.</p>
   <button id="locateBtn">Get My Location & Search</button>
   <div id="status"></div>
   <div id="result"></div>
@@ -37,7 +37,7 @@
       navigator.geolocation.getCurrentPosition(
         success,
         error,
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 } // Mobile-optimized options
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }  // Mobile-optimized, wait up to 10 secs before timeout, force fresh GPS reading every time press button
       );
     }
 
