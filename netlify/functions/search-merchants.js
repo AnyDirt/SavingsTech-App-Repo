@@ -5,7 +5,15 @@ const CERT_BASE64 = 'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQzakNDQXNhZ0F3SUJ
 
 const KEY_BASE64 = 'LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBcjdveWVlbnF4Y1NLVjBTTmZBckVOaVhWWXNEaVl5djJxbnhkZnVCcUJEVlYySkduCmcrNlU4YzNnSWw4a2ZWOGZibkNDa2szc0J0empxeVRYM3l6a2lQUU5BZVRqeTA0R0ZVTUk3TkVOc0Q3YlhWNTIKeDZaYTdJRzQ1V0tURS95TXpORXhOUDJHSE8yUi9pcERrVkhWdWxkeWRtNnFWUTRSRlBYRTc3RWlIeHg1bk5sNQpIbXFkRkw2NEtCUVNGZ0w2c1NVNWlFRXNTd3hzVzhmTVAyL0c3ZXNZVWRab21uSWI3RWVNSTZ4Zm8rTmhBZTVXCnJSQlN1dnh4cWVqcnJJb1piQ1ZEMVFwdUo1emJ2VTUvcnNNa1p2ODNzYSt5eHFhK1pTOXNHbW9ORi90K3gxZTUKUVlmU2RGRHRJdWNodXFuN0xwL3daODJkc0htSjIrMWNqemo2clFJREFRQUJBb0lCQUF5UWFjajlNRS9GRW1ZVQpiUEJFUGN5b1RsWXg5ODNDNkM4KzFwbDZkcUlINVRRbmo5eFhPOWVCRW9ncW1NdU0rRXlYWjBLS0p6akRaTlRJCi9OVkVXcSt2RVZvRUVVUnBOdmFndFJ2bmc0ekpKYnFLaFVBWGxSTXBZRHlvWEY4MnRLTjFSb2tsSWtoaHRRbEEKNE5WY1RrVjFPS1llbWZlY1dwek95SzZoa2RDN0JHSlJmOTRDRm5MazUweHFzUC8xbkxVUnd2VlhVT1VLSDRmOApxbFVEVFd4TDZYa2NoWVB3N3V4WmI5YkhJL0pGSnkvSXNIcU03QWNUbkpvM2o3akl2eGpBL0Y3NkN2bGJlb210CkQwdjcwQzJFaGJNYjZYWWVqQzlmbU4wZUlMbWw3NDVBUWk4dFZWdUFvcHp4R2E1MHQvS0lZRmY1Wk5qY1hZQjMKT3ZCMktURUNnWUVBMEdKcVFpd2d6SkxWNFN6Z0FKLzhMRnNFcFRNV3Y4YnhRTzJVbld1OEE4WkZCQW1pdlQ5OQorY0FMN01udjRrVHVtQllvUXY2ZmFmNFg5RGhFcENHWlc5U1UzTndsM1FESFNXT2lQWTRFb1JMdlBpb2g1Rk40CkZQMjVSVHdSbElpOVAxajVqejdDMjNoQndHZmI5R2dhZ1R6RE4yNnFJREF5aTBra29HMC9NTDBDZ1lFQTErRjcKd2JBNWx6S2FZNHpOaG5idmdsODV1UnYyZnN5RnJKc2NuWXZQZmhDcnJaaSs4M3pOVXRtQzdEL2F6SmcvZFRZLwpESVppNUMwUHh3Zi9tbU82a0dqeGZrTU1sc0hScjB3MnlKdEJHeW9zdWo0cFBFMlJBMXptM0thSnBsNVdVUU5TCnZFdlFVQ1JrblpZSUErUzJEWlFselVxY292ckVxTlhBblFJaDZMRUNnWUFubTkxSXNLeVhWZjJ6YkYwem9UVkUKbFJSZjlrTUh0dC9ha0k0a0VmdE4yRno3OUh6cmJlc2JFc2J4Zmp6TGpJQ3hoZHluUjFDenkrbHZzVlpTd0ZRdgpJVXdlWXZZTGVQOW9VcmplN0dTeTNTOSthSEhDdlo3Z2xvMmx2RkkzSW5xZVZPSXl1U0krcHpBUVMyMkNtbHNYClg1NVhwZ0JPVi9yemdMYW1pNzFzSFFLQmdRQ3JncDNTMU5IOFdKeW1DSUJrbXV0UUZaMkRmajdJb0c1M0lraUsKdGovajlSU2Y5NkdGU3BySmZydHdQSTcxU3VQbm1IQmc0QWVESm5YSmQ0WlB2M25DTDAzbE5SbTBVRW5wemxBYgo4cFM0SXpxandLejhGdGZsNXhJWExVeGcyOFFSMnVVSmFlWVhOY0ttSEVORDdKbmlrZGV5a050KzlHSDNqTkxaCktvK01FUUtCZ0dQeHg3UkZ4eERDTHoxaEZHTWNFMFlESVJPZ1VLVXJYTGdZN3o5a3ZKQ0ViOGs0ZjJkQ01wcWkKR01WR2NWNkF4c00wMTFidituSjNmalZCK2hObnpIcDU0SSthM2FJeTVxUit3cXNtY2dOY3VOTjRUYjBFa0RwNApHbE5GamhNRVBBWUwwaW9LTnpod0Q4dnFNQWU4dXZFTENFSkNqajc1R3dXNEV1ZU1ZTktpCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==';
 
+
 exports.handler = async (event) => {
+  // Log all incoming request details for debugging
+  console.log('=== REQUEST DEBUG INFO ===');
+  console.log('HTTP Method:', event.httpMethod);
+  console.log('Headers:', JSON.stringify(event.headers, null, 2));
+  console.log('Query Parameters:', JSON.stringify(event.queryStringParameters, null, 2));
+  console.log('Raw Body:', event.body);
+  
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -14,7 +22,19 @@ exports.handler = async (event) => {
     };
   }
 
+  try {
+    const parsedBody = JSON.parse(event.body);
+    console.log('Parsed Body:', JSON.stringify(parsedBody, null, 2));
+    console.log('Latitude:', parsedBody.latitude);
+    console.log('Longitude:', parsedBody.longitude);
+    console.log('Radius:', parsedBody.radius);
+  } catch (e) {
+    console.log('Error parsing body:', e.message);
+  }
+  console.log('=========================');
+
   const { latitude, longitude, radius } = JSON.parse(event.body);
+
 
   // Decode certificates
   const cert = Buffer.from(CERT_BASE64, 'base64').toString('utf-8');
@@ -102,6 +122,12 @@ exports.handler = async (event) => {
           // Adjust distance for gas stations (pumps in parking lot)
           if (mccArray.includes('5542') || mccArray.includes('5541')) {
             distance = Math.max(0, distance - 0.025);
+          }
+
+          // Adjust distance for service businesses (inside building or in back areas, not storefront)
+          const hasServiceMCC = mccArray.some(mcc => parseInt(mcc) > 7200);
+          if (hasServiceMCC) {
+            distance = distance + 0.015;
           }
 
           return {
