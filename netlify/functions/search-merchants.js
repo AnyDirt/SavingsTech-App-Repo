@@ -14,6 +14,19 @@ exports.handler = async (event) => {
   console.log('Query Parameters:', JSON.stringify(event.queryStringParameters, null, 2));
   console.log('Raw Body:', event.body);
   
+  // Handle CORS preflight requests (needed for web apps from other origins)
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -127,7 +140,7 @@ exports.handler = async (event) => {
           // Adjust distance for service businesses (inside building or in back areas, not storefront)
           const hasServiceMCC = mccArray.some(mcc => parseInt(mcc) > 7200);
           if (hasServiceMCC) {
-            distance = distance + 0.015;
+            distance = distance + 0.025;
           }
 
           return {
