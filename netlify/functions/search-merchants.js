@@ -7,14 +7,8 @@ const KEY_BASE64 = 'LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NB
 
 
 exports.handler = async (event) => {
-  // Log all incoming request details for debugging
-  console.log('=== REQUEST DEBUG INFO ===');
-  console.log('HTTP Method:', event.httpMethod);
-  console.log('Headers:', JSON.stringify(event.headers, null, 2));
-  console.log('Query Parameters:', JSON.stringify(event.queryStringParameters, null, 2));
-  console.log('Raw Body:', event.body);
-  
-  // Handle CORS preflight requests (needed for web apps from other origins)
+
+  // Handle CORS preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -26,7 +20,7 @@ exports.handler = async (event) => {
       body: ''
     };
   }
-
+  
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -35,19 +29,7 @@ exports.handler = async (event) => {
     };
   }
 
-  try {
-    const parsedBody = JSON.parse(event.body);
-    console.log('Parsed Body:', JSON.stringify(parsedBody, null, 2));
-    console.log('Latitude:', parsedBody.latitude);
-    console.log('Longitude:', parsedBody.longitude);
-    console.log('Radius:', parsedBody.radius);
-  } catch (e) {
-    console.log('Error parsing body:', e.message);
-  }
-  console.log('=========================');
-
   const { latitude, longitude, radius } = JSON.parse(event.body);
-
 
   // Decode certificates
   const cert = Buffer.from(CERT_BASE64, 'base64').toString('utf-8');
